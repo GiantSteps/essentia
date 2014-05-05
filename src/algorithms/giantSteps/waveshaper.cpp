@@ -32,16 +32,16 @@ const char* waveshaper::name = "waveshaper";
 const char* waveshaper::description = DOC(
 "shapes the signal to a waveshaping model made of 3 continuous linear part\n"
 "(p1,p2),(p2,p3),(p3,p4) "
-"\n"
-"\n"
+"normalize option stands for pre-normalizing before waveshaping process\n"
+"symmetric option waveshapes the absolute value of the signal\n"
 "References:\n"
 " \n");
 
 
 void waveshaper::configure() {
 
-_isAbs = parameter("isAbs").toBool();
-_isRel = parameter("isRel").toBool();
+_symmetric = parameter("symmetric").toBool();
+_normalize = parameter("normalize").toBool();
 
   _p1x =  parameter("p1x").toReal();
   _p2x =  parameter("p2x").toReal();
@@ -72,9 +72,9 @@ void waveshaper::compute() {
   }
   else{
   signalout.resize( int(signal.size()));
-  float max =1.0;
-  if (_isRel){
-  max = 0.000001;
+  Real max =1.0;
+  if (_normalize){
+  max = 1e-37;
   for (int i = 0;i<int(signal.size());i++){
   max = std::max(max,abs(signal[i]));
   }
@@ -82,19 +82,22 @@ void waveshaper::compute() {
   bool neg = false;
   for(int i = 0 ; i< int(signal.size());i++){
   Real cur = signal[i];
-  if(_isRel){cur/=max;}
-  if(_isAbs){neg =cur<0; cur = abs(cur);} 
-	if(cur>_p1x&&cur<=_p2x)  
-		{signalout[i] = (Real)(_p1y+(cur-_p1x)*_c1);}
-	else if(cur>_p2x&&cur<=_p3x) 
-		{signalout[i] = (Real)(_p2y+(cur-_p2x)*_c2);}
-	else if(cur>_p3x&&cur<=_p4x) 
-		{signalout[i] = (Real)(_p3y+(cur-_p3x)*_c3);}
-	else if(cur<_p1x) 
-		{signalout[i] = (Real)_p1y;}
-	else 
-		{signalout[i] = (Real)_p4y;}
-   if(_isAbs && neg){signalout[i] *=-1;}
+	  if(_normalize){cur/=max;}
+	  if(_symmetric){neg =cur<0; cur = abs(cur);} 
+		
+		
+		if(cur>_p1x&&cur<=_p2x)  
+			{signalout[i] = (Real)(_p1y+(cur-_p1x)*_c1);}
+		else if(cur>_p2x&&cur<=_p3x) 
+			{signalout[i] = (Real)(_p2y+(cur-_p2x)*_c2);}
+		else if(cur>_p3x&&cur<=_p4x) 
+			{signalout[i] = (Real)(_p3y+(cur-_p3x)*_c3);}
+		else if(cur<=_p1x) 
+			{signalout[i] = (Real)_p1y;}
+		else 
+			{signalout[i] = (Real)_p4y;}
+   
+   if(_symmetric && neg){signalout[i] *=-1;}
   }
   
   }

@@ -278,25 +278,22 @@ void AudioContext::encodePacket(int size) {
   packet.size = avcodec_encode_audio(_codecCtx, _outputBuffer, frame_bytes, (short*)_inputBuffer);
   _codecCtx->frame_size = tmp_fs;
 
-  /*
-  cout << "\tpacket size: " << packet.size
-       << "\tnum samples: " << size
-       << "\tframe bytes: " << frame_bytes
-       << "\toutput buf size: " << _outputBufSize
-       << "\tinput buf size: " << _inputBufSize
-       << "\tduration: " << duration
-       << endl;
-  */
+ 
+
+
 
   if (packet.size < 0) throw EssentiaException("Error while encoding audio frame");
 
-  if (_codecCtx->coded_frame->pts != (int)AV_NOPTS_VALUE) {
-    packet.pts = av_rescale_q(_codecCtx->coded_frame->pts, _codecCtx->time_base, _avStream->time_base);
-  }
+  //if (_codecCtx->coded_frame->pts != (int)AV_NOPTS_VALUE) {
+
+   // packet.pts = av_rescale_q(_codecCtx->coded_frame->pts, _codecCtx->time_base, _avStream->time_base);
+    
+  //}
 
   packet.flags |= AV_PKT_FLAG_KEY;
   packet.stream_index = _avStream->index;
   packet.data = _outputBuffer;
+
 
   // write the frame in the media file
   if (av_interleaved_write_frame(_demuxCtx, &packet) != 0 ) {

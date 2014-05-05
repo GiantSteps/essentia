@@ -43,12 +43,16 @@ UnaryOperator::OpType UnaryOperator::typeFromString(const std::string& name) con
   if (name == "cos") return COS;
   if (name == "sqrt") return SQRT;
   if (name == "square") return SQUARE;
+  if (name == "cube") return CUBE;
 
   throw EssentiaException("UnaryOperator: Unknown unary operator type: ", name);
 }
 
 inline Real square_func(Real x) {
   return x*x;
+}
+inline Real cube_func(Real x) {
+  return x*x*x;
 }
 
 #define APPLY_FUNCTION(f) {             \
@@ -119,6 +123,7 @@ void UnaryOperator::compute() {
     }
 
   case SQUARE: APPLY_FUNCTION(square_func);
+  case CUBE: APPLY_FUNCTION(cube_func);
 
   default:
     throw EssentiaException("UnaryOperator: Unknown unary operator type");

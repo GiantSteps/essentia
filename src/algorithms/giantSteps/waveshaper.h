@@ -51,8 +51,8 @@ class waveshaper : public Algorithm {
 	declareParameter("p3y","coordinate","(-inf,inf)",0.6);
 	declareParameter("p4x","coordinate","(-inf,inf)",1);
 	declareParameter("p4y","coordinate","(-inf,inf)",1);
-	declareParameter("isAbs","symetric mode","{true,false}", true);
-	declareParameter("isRel","normalisation mode","{true,false}", true);
+	declareParameter("symmetric","symetric mode","{true,false}", true);
+	declareParameter("normalize","normalisation mode","{true,false}", true);
   }
 
   void configure();
@@ -75,8 +75,8 @@ class waveshaper : public Algorithm {
 	double _c1;
 	double _c2;
 	double _c3;
-	bool _isAbs;
-	bool _isRel;
+	bool _symmetric;
+	bool _normalize;
 
 };
 
