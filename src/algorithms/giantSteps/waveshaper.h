@@ -23,6 +23,7 @@
 #include "algorithmfactory.h"
 #include <complex>
 
+
 namespace essentia {
 namespace standard {
 
@@ -32,25 +33,25 @@ class waveshaper : public Algorithm {
   Input<std::vector<Real> > _signal;
   Output<std::vector<Real> > _signalout;
 
+	Algorithm* _splinef;
+
 
 
  public:
   waveshaper()   {
     declareInput(_signal, "array", "the array to be shaped");
     declareOutput(_signalout, "shaped_signal", "shaped");
-
+    _splinef = AlgorithmFactory::create("Spline");
   }
 
   void declareParameters() {
+	std::vector<Real> defaultP(2);
+	defaultP[0]=0;
+	defaultP[1]=1;
 
-	declareParameter("p1x","coordinate","(-inf,inf)",0);
-	declareParameter("p1y","coordinate","(-inf,inf)",0);
-	declareParameter("p2x","coordinate","(-inf,inf)",0.3);
-	declareParameter("p2y","coordinate","(-inf,inf)",0.3);
-	declareParameter("p3x","coordinate","(-inf,inf)",0.6);
-	declareParameter("p3y","coordinate","(-inf,inf)",0.6);
-	declareParameter("p4x","coordinate","(-inf,inf)",1);
-	declareParameter("p4y","coordinate","(-inf,inf)",1);
+    declareParameter("xPoints", "the x-coordinates where data is specified (the points must be arranged in ascending order and cannot contain duplicates)", "",defaultP);
+    declareParameter("yPoints", "the y-coordinates to be interpolated (i.e. the known data)", "",  defaultP);
+	declareParameter("spline","spline mode","{true,false}", true);
 	declareParameter("symmetric","symetric mode","{true,false}", true);
 	declareParameter("normalize","normalisation mode","{true,false}", true);
   }
@@ -64,19 +65,11 @@ class waveshaper : public Algorithm {
   
   
   private:
-	Real _p1x;
-	Real  _p2x;
-	Real  _p3x;
-	Real  _p4x;
-	Real  _p1y;
-	Real  _p2y;
-	Real  _p3y;
-	Real  _p4y;
-	double _c1;
-	double _c2;
-	double _c3;
+	std::vector<Real> _xpts,_ypts;
+
 	bool _symmetric;
 	bool _normalize;
+	bool _spline;
 
 };
 

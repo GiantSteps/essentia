@@ -30,8 +30,8 @@ using namespace standard;
 
 const char* waveshaper::name = "waveshaper";
 const char* waveshaper::description = DOC(
-"shapes the signal to a waveshaping model made of 3 continuous linear part\n"
-"(p1,p2),(p2,p3),(p3,p4) "
+"shapes the signal to a waveshaping model made of continuous linear part\n"
+"optionally spline it"
 "normalize option stands for pre-normalizing before waveshaping process\n"
 "symmetric option waveshapes the absolute value of the signal\n"
 "References:\n"
@@ -43,21 +43,79 @@ void waveshaper::configure() {
 _symmetric = parameter("symmetric").toBool();
 _normalize = parameter("normalize").toBool();
 
-  _p1x =  parameter("p1x").toReal();
-  _p2x =  parameter("p2x").toReal();
-  _p3x =  parameter("p3x").toReal();
-  _p4x =  parameter("p4x").toReal();
-  _p1y =  parameter("p1y").toReal();
-  _p2y =  parameter("p2y").toReal();
-  _p3y =  parameter("p3y").toReal();
-  _p4y =  parameter("p4y").toReal();
-if(_p1x>=_p2x||_p2x>=_p3x||_p3x>=_p4x) throw EssentiaException("wrong Params or badly sorted p1x<p2x<p3x<p4x") ;
-  _c1 = (_p2y-_p1y)*1.0/(_p2x-_p1x);
-  _c2 = (_p3y-_p2y)*1.0/(_p3x-_p2x);
-  _c3 = (_p4y-_p3y)*1.0/(_p4x-_p3x);
-  
-  
 
+
+vector<Real> _curxpts = parameter("xPoints").toVectorReal();
+vector<Real> _curypts = parameter("yPoints").toVectorReal();
+
+if(_curxpts.size()==0){
+throw EssentiaException("no xpts or ypts") ;
+}
+else{
+int start = 0;
+int avoidDouble = 0;
+if (_symmetric){
+_xpts.resize(2*_curxpts.size());
+_ypts.resize(2*_curxpts.size());
+for(int i = _curxpts.size()-1 ; i>0 ;i--){
+_xpts[(_curxpts.size()-1)-i]= (-1.*_curxpts[i]);
+_ypts[(_curypts.size()-1)-i]= (-1.*_curypts[i]);
+
+
+}
+cout<<"p"<<endl;
+cout<<_xpts<<endl;
+cout<<_ypts<<endl;	
+start= _curxpts.size();
+ if( _curxpts[0]==0){ avoidDouble = -1;
+ 
+ }
+
+}
+
+for(int i = avoidDouble==0?0:1 ; i<_curxpts.size() ;i++){
+_xpts[i+start+avoidDouble] =_curxpts[i];
+_ypts[i+start+avoidDouble] =_curypts[i];
+
+
+}
+if (avoidDouble!=0){
+_xpts.resize(_xpts.size()-1);
+_ypts.resize(_ypts.size()-1);
+}
+
+
+
+_spline = parameter("spline").toBool();
+
+
+bool integrity=true;
+if(_xpts.size()!=_ypts.size() ){
+integrity=false;
+
+}
+else{
+for (int i = 1 ; i< _xpts.size();i++){
+if(_xpts[i]<_xpts[i-1]){
+integrity=false;
+
+break;
+}
+}
+}
+if(!integrity) {throw EssentiaException("wrong xpts or ypts") ;}
+
+
+_splinef->configure("xPoints",_xpts,
+					"yPoints",_ypts,
+					"type","b"
+					);
+					
+cout<<_xpts<<endl;
+cout<<_ypts<<endl;					 
+  
+//   
+}
 }
 
 void waveshaper::compute() {
@@ -80,24 +138,35 @@ void waveshaper::compute() {
   }
   }
   bool neg = false;
+  
   for(int i = 0 ; i< int(signal.size());i++){
-  Real cur = signal[i];
-	  if(_normalize){cur/=max;}
-	  if(_symmetric){neg =cur<0; cur = abs(cur);} 
+	Real cur = signal[i];
+  	if(_normalize){cur/=max;}
+	
+	
+	if (_spline){ 
+	_splinef->input("x").set(cur);
+	_splinef->output("y").set(signalout[i]);
+	_splinef->compute();
+			}
+	else{
+		if(cur<=_xpts[0]){
+			signalout[i]=_ypts[0];
+		}
+		else if(cur>=_xpts[_xpts.size()-1]){
+			signalout[i]=_ypts[_xpts.size()-1];
+		}
+		else{
+			for(int j = 1 ; j< _xpts.size();j++){
+				if(cur>_xpts[j-1]&&cur<=_xpts[j]){
+				signalout[i] = (Real)(_ypts[j-1]+(cur-_xpts[j-1])*1.0*(_ypts[j]-_ypts[j-1])*1.0/(_xpts[j]-_xpts[j-1]));
+				break;
+				}
+			}
 		
-		
-		if(cur>_p1x&&cur<=_p2x)  
-			{signalout[i] = (Real)(_p1y+(cur-_p1x)*_c1);}
-		else if(cur>_p2x&&cur<=_p3x) 
-			{signalout[i] = (Real)(_p2y+(cur-_p2x)*_c2);}
-		else if(cur>_p3x&&cur<=_p4x) 
-			{signalout[i] = (Real)(_p3y+(cur-_p3x)*_c3);}
-		else if(cur<=_p1x) 
-			{signalout[i] = (Real)_p1y;}
-		else 
-			{signalout[i] = (Real)_p4y;}
-   
-   if(_symmetric && neg){signalout[i] *=-1;}
+		}
+	}
+
   }
   
   }

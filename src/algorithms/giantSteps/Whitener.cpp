@@ -29,7 +29,7 @@ namespace standard {
 
 
 const char* Whitener::name = "Whitener";
-const char* Whitener::description = DOC("Remove n First Max FFT");
+const char* Whitener::description = DOC("Whitening preprocessing from audio to audio");
 
 
 void Whitener::configure() {
@@ -46,10 +46,11 @@ void Whitener::configure() {
   _windowing->configure("size", frameSize,
                         "zeroPadding", 0,
                         "type", "hann");
-	_peaksf->configure("sampleRate",sampleRate);
+	_peaksf->configure("sampleRate",sampleRate,
+	"maxPeaks",parameter("peaksNumber").toInt());
 
-_whiteningf->configure("sampleRate",sampleRate,
-						"maxPeaks",parameter("peaksNumber").toInt()
+_whiteningf->configure("sampleRate",sampleRate
+						
 						);
 
 // 

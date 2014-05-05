@@ -67,6 +67,7 @@ void Spline::configure() {
 
   vector<Real> x = parameter("xPoints").toVectorReal();
   vector<Real> y = parameter("yPoints").toVectorReal();
+
   if (x.size() != y.size() ) {
     throw EssentiaException("parameter 'xPoints' must have the same size than parameter 'yPoints')");
   }
