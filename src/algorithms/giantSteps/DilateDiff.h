@@ -29,7 +29,7 @@ class DilateDiff : public Algorithm {
 
  private:
  
-  Input<vector<TNT::Array2D<Real> > > _bands;
+  Input<TNT::Array2D<Real>  > _bands;
   Output<std::vector<Real> > _diffs;
 
 
@@ -44,7 +44,7 @@ class DilateDiff : public Algorithm {
 
  public:
   DilateDiff() {
-    declareInput(_signal, "bands", "the input bands spectrogram");
+    declareInput(_bands, "bands", "the input bands spectrogram");
     declareOutput(_diffs, "Differences", "DilateDiffd input");
 
     
@@ -83,9 +83,9 @@ namespace streaming {
 class DilateDiff : public AlgorithmComposite {
 
  protected:
-  SinkProxy<Real> _signal;
-  Source<Real> _Harmonic;
-  Source<Real> _Noise;
+  SinkProxy<Real> _bands;
+  Source<Real> _diffs;
+
 
   Pool _pool;
   Algorithm* _poolStorage;

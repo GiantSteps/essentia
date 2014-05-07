@@ -52,31 +52,35 @@ void DilateDiff::compute() {
 	vector<Real>& diffs = _diffs.get();
 	
 
-		
-  if (bands.empty()) {
-bands.resize(0);
-    return;
-  }
+
   int nFrames = bands.dim2();
   int nBands= bands.dim1();
+  if(!nFrames || !nBands){
+  throw EssentiaException("DilateDiff : empty bands or frames");
+  }
 	diffs.resize(nFrames);
-	vector<Real> maxs = vector<Real>(nBands);
-
+	vector<Real> maxs = vector<Real>(nBands,0.);
+	
 //TODO: reduce vector length for unecessary bounds
 
-for (int i = 0 ; i< nFrames;i++){
+for (int i = _frameW ; i< nFrames;i++){
 
 	for(int j = _binW ; j<nBands-_binW ; j++){
 		
-		
 		for (int k = j-_binW ; k<j+_binW ; k++){
-		maxs[j] = max(
+		maxs[j] = max(maxs[j],bands[i][k]);
 		
 		}
 	
-	
+	}
+	diffs[i]=0;
+	for(int j = _binW ; j<nBands-_binW ; j++){
+		
+		diffs[i] += bands[i-_frameW][j]-maxs[j]; 
 	
 	}
+	diffs[i]/=nBands-2*_binW;
+	
 
 
 
@@ -125,7 +129,7 @@ const char* DilateDiff::description = standard::DilateDiff::description;
 DilateDiff::DilateDiff() : AlgorithmComposite() {
 
   _DilateDiff = standard::AlgorithmFactory::create("DilateDiff");
-    declareInput(_signal, "bands", "the input bands spectrogram");
+    declareInput(_bands, "bands", "the input bands spectrogram");
     declareOutput(_diffs, "Differences", "DilateDiffd input");
 }
 
