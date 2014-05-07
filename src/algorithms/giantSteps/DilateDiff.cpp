@@ -18,7 +18,6 @@
  */
 
 #include "DilateDiff.h"
-#include <complex>
 #include "essentiamath.h"
 
 using namespace std;
@@ -34,9 +33,9 @@ const char* DilateDiff::description = DOC("Maximum filter");
 void DilateDiff::configure() {
  	
     _binW = int(parameter("binWidth").toInt()/2);
-	_frameW = parameter("frameWidth").toInt();
+	_frameWi = parameter("frameWidth").toInt();
 
-
+_pos = parameter("Positive").toBool();
 
 
 
@@ -52,34 +51,39 @@ void DilateDiff::compute() {
 	vector<Real>& diffs = _diffs.get();
 	
 
+	
+	
 
-  int nFrames = bands.dim2();
-  int nBands= bands.dim1();
+  int nFrames = bands.dim1();
+  int nBands= bands.dim2();
   if(!nFrames || !nBands){
   throw EssentiaException("DilateDiff : empty bands or frames");
   }
 	diffs.resize(nFrames);
-	vector<Real> maxs = vector<Real>(nBands,0.);
+	Real maxs = 0;
 	
-//TODO: reduce vector length for unecessary bounds
-
-for (int i = _frameW ; i< nFrames;i++){
-
-	for(int j = _binW ; j<nBands-_binW ; j++){
-		
-		for (int k = j-_binW ; k<j+_binW ; k++){
-		maxs[j] = max(maxs[j],bands[i][k]);
-		
-		}
 	
-	}
+
+
+
+for (int i = _frameWi ; i< nFrames;i++){
 	diffs[i]=0;
 	for(int j = _binW ; j<nBands-_binW ; j++){
+		maxs =bands[i-_frameWi][j-_binW];
+		for (int k = j-_binW+1 ; k<=j+_binW ; k++){
+		maxs = max(maxs,bands[i-_frameWi][k]);
+
 		
-		diffs[i] += bands[i-_frameW][j]-maxs[j]; 
+		
+		}
+		Real currentDiff = bands[i][j]-maxs;
+		if(!(_pos && currentDiff<0)){diffs[i] +=currentDiff ; }
+		
 	
+
 	}
-	diffs[i]/=nBands-2*_binW;
+	
+	//diffs[i]/=(nBands-2.*_binW);
 	
 
 

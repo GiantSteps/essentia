@@ -34,9 +34,9 @@ class DilateDiff : public Algorithm {
 
 
   
-  int _binW;
-  int _frameW;
-
+  	int _binW;
+  	int _frameWi;
+	bool _pos;
 
 
 
@@ -56,15 +56,14 @@ class DilateDiff : public Algorithm {
 
   void declareParameters() {
     declareParameter("binWidth", "height(n of frequency bins) of the DilateDiffFilter", "(0,inf)", 3);
-	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 5);
+	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 2);
+	declareParameter("Positive", "keep only positive ones", "{false,true}", true);
 }
 
   void reset();
   void configure();
   void compute();
 
-  void computeInfoGain();
-  void computeBeatEmphasis();
 
   static const char* name;
   static const char* version;

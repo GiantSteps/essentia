@@ -126,6 +126,7 @@ void Windowing::hann() {
 
   for (int i=0; i<size; i++) {
     _window[i] = 0.5 - 0.5 * cos((2.0*M_PI*i) / (size - 1.0));
+    
   }
 }
 
