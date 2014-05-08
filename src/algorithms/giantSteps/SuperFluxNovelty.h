@@ -17,15 +17,15 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-#ifndef ESSENTIA_DILATEDIFF_H
-#define ESSENTIA_DILATEDIFF_H
+#ifndef ESSENTIA_SUPERFLUXNOVELTY_H
+#define ESSENTIA_SUPERFLUXNOVELTY_H
 
 #include "algorithmfactory.h"
 
 namespace essentia {
 namespace standard {
 
-class DilateDiff : public Algorithm {
+class SuperFluxNovelty : public Algorithm {
 
  private:
  
@@ -43,19 +43,19 @@ class DilateDiff : public Algorithm {
 
 
  public:
-  DilateDiff() {
+  SuperFluxNovelty() {
     declareInput(_bands, "bands", "the input bands spectrogram");
-    declareOutput(_diffs, "Differences", "DilateDiffd input");
+    declareOutput(_diffs, "Differences", "SuperFluxNoveltyd input");
 
     
   }
 
-  ~DilateDiff() {
+  ~SuperFluxNovelty() {
 
   }
 
   void declareParameters() {
-    declareParameter("binWidth", "height(n of frequency bins) of the DilateDiffFilter", "(0,inf)", 3);
+    declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "(0,inf)", 3);
 	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 2);
 	declareParameter("Positive", "keep only positive ones", "{false,true}", true);
 }
@@ -79,7 +79,7 @@ class DilateDiff : public Algorithm {
 namespace essentia {
 namespace streaming {
 
-class DilateDiff : public AlgorithmComposite {
+class SuperFluxNovelty : public AlgorithmComposite {
 
  protected:
   SinkProxy<Real> _bands;
@@ -88,20 +88,20 @@ class DilateDiff : public AlgorithmComposite {
 
   Pool _pool;
   Algorithm* _poolStorage;
-  standard::Algorithm * _DilateDiff;
+  standard::Algorithm * _SuperFluxNovelty;
 
 
  public:
-  DilateDiff();
-  ~DilateDiff();
+  SuperFluxNovelty();
+  ~SuperFluxNovelty();
 
   void declareParameters() {
-    declareParameter("binWidth", "height(n of frequency bins) of the DilateDiffFilter", "(0,inf)", 3);
+    declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "(0,inf)", 3);
 	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 5);
   }
 
   void configure() {
-    _DilateDiff->configure(
+    _SuperFluxNovelty->configure(
                                      INHERIT("frameWidth"),
                                      INHERIT("binWidth")
                                      );
@@ -123,4 +123,4 @@ class DilateDiff : public AlgorithmComposite {
 } // namespace streaming
 } // namespace essentia
 
-#endif // ESSENTIA_DilateDiff_H
+#endif // ESSENTIA_SuperFluxNovelty_H

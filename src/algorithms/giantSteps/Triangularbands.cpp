@@ -24,7 +24,7 @@ using namespace essentia;
 using namespace standard;
 
 const char* Triangularbands::name = "Triangularbands";
-const char* Triangularbands::description = DOC("This algorithm computes the energy of an input spectrum for an arbitrary number of non overlapping frequency bands. For each band the power-spectrum (mag-squared) is summed.\n"
+const char* Triangularbands::description = DOC("This algorithm computes the energy of an input spectrum for an arbitrary number of overlapping Triangular frequency bands. For each band the power-spectrum (mag-squared) is summed.\n"
 "\n"
 "Parameter \"Triangularbands\" must contain at least 2 frequencies, they all must be positive and must be ordered ascentdantly, otherwise an exception will be thrown. Triangularbands is only defined for spectra, which size is greater than 1.\n"
 "\n"
@@ -82,8 +82,5 @@ void Triangularbands::compute() {
     }
   }
 
-  // decision: don't scale the bands in any way...
-  // this way, when summing the energy, we will get consistent *summed* results
-  // for different FFT-sizes, (with zero-overlap)
 }
 
