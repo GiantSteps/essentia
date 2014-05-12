@@ -28,8 +28,8 @@ namespace standard {
 
 
 const char* MaxFilter::name = "MaxFilter";
-const char* MaxFilter::description = DOC("Superflux algorithm : Maximum filter and differentiation for onset detection robust again vibrato"
-"Input : filterbank like spectrogram");
+const char* MaxFilter::description = DOC("Maximum filter for 1d signal (van Herk/Gil-Werman Algorithm ) "
+"");
 
 
 void MaxFilter::configure() {
@@ -43,7 +43,6 @@ void MaxFilter::configure() {
 
 #ifdef HERKGIL
 
-//ToODO: faster max filter but Not Working
 void MaxFilter::compute() {
 
 
@@ -81,8 +80,6 @@ for(int u = kl ; u<size ; u+=_width-1){
 		
 		for (int i = 0 ; i <= _width-2 ; i++){
 			filtered[u-kl+i] = max(cs[i],ds[i]);
-			
-		
 		}
 		
 	
@@ -164,8 +161,8 @@ const char* MaxFilter::description = standard::MaxFilter::description;
 MaxFilter::MaxFilter() : AlgorithmComposite() {
 
   _MaxFilter = standard::AlgorithmFactory::create("MaxFilter");
-    declareInput(_array, "bands", "the input bands spectrogram");
-    declareOutput(_filtered, "Differences", "MaxFilterd input");
+    declareInput(_array, "signal", "signal to be filtered");
+    declareOutput(_filtered, "signal", "filtered output ");
 }
 
 MaxFilter::~MaxFilter() {

@@ -100,6 +100,9 @@ for (int i = _frameWi ; i< nFrames;i++){
 	//diffs[i]/=(nBands-2.*_binW);
 }
 }
+
+
+
 #else
 void SuperFluxNovelty::compute() {
   	const TNT::Array2D<Real>& bands = _bands.get();

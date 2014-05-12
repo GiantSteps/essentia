@@ -36,15 +36,10 @@ class MaxFilter : public Algorithm {
   
   	int _width;
 
-
-
-
-
-
  public:
   MaxFilter() {
-    declareInput(_array, "signal", "the input bands spectrogram");
-    declareOutput(_filtered, "signal", "MaxFilterd input");
+    declareInput(_array, "signal", "signal to be filtered");
+    declareOutput(_filtered, "signal", "filtered output ");
 
     
   }
@@ -54,7 +49,7 @@ class MaxFilter : public Algorithm {
   }
 
   void declareParameters() {
-    declareParameter("width", "window size for max filter ", "(2,inf)", 3);
+    declareParameter("width", "window size for max filter : has to be odd as the window is centered on sample", "(3,inf)", 3);
 
 }
 
@@ -94,13 +89,13 @@ class MaxFilter : public AlgorithmComposite {
   ~MaxFilter();
 
   void declareParameters() {
-    declareParameter("width", "height(n of frequency bins) of the MaxFilterFilter", "(0,inf)", 3);
+    declareParameter("width", "window size for max filter ", "(3,inf)", 3);
 
   }
 
   void configure() {
     _MaxFilter->configure(                                     
-                                     INHERIT("binWidth")
+                                     INHERIT("width")
                                      );
   }
 

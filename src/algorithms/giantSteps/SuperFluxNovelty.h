@@ -39,7 +39,7 @@ class SuperFluxNovelty : public Algorithm {
 	bool _pos;
 
 
-
+Algorithm* _maxf;
 
 
  public:
