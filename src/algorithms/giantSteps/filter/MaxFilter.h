@@ -49,7 +49,7 @@ class MaxFilter : public Algorithm {
   }
 
   void declareParameters() {
-    declareParameter("width", "window size for max filter : has to be odd as the window is centered on sample", "(3,inf)", 3);
+    declareParameter("width", "window size for max filter : has to be odd as the window is centered on sample", "[3,inf)", 3);
 
 }
 
@@ -89,7 +89,7 @@ class MaxFilter : public AlgorithmComposite {
   ~MaxFilter();
 
   void declareParameters() {
-    declareParameter("width", "window size for max filter ", "(3,inf)", 3);
+    declareParameter("width", "window size for max filter ", "[3,inf)", 3);
 
   }
 

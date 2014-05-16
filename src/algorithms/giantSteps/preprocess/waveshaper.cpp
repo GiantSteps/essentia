@@ -18,11 +18,12 @@
  */
 
 #include "waveshaper.h"
-#include "essentiamath.h"
+
 
 using namespace std;
 using namespace essentia;
 using namespace standard;
+using namespace util;
 
 
 
@@ -48,78 +49,66 @@ _normalize = parameter("normalize").toBool();
 vector<Real> _curxpts = parameter("xPoints").toVectorReal();
 vector<Real> _curypts = parameter("yPoints").toVectorReal();
 
+
+// check integrity
 if(_curxpts.size()==0){
 throw EssentiaException("no xpts or ypts") ;
+return;
 }
-else{
+if(_curxpts.size()!=_curypts.size() ){
+	throw EssentiaException("xpts and ypts have different size ") ;
+	return;
+}
+for (int i = 1 ; i< _curxpts.size();i++){
+	if(_curxpts[i]<_curxpts[i-1]){throw EssentiaException("xpts has to be ordered ") ;
+	return;}
+}
+
+
+
+
+
+
+// make symmetric if asked
 int start = 0;
-int avoidDouble = 0;
+int avoidDouble = 0; // handleing 0 center double
 if (_symmetric){
-_xpts.resize(2*_curxpts.size());
-_ypts.resize(2*_curxpts.size());
-for(int i = _curxpts.size()-1 ; i>0 ;i--){
-_xpts[(_curxpts.size()-1)-i]= (-1.*_curxpts[i]);
-_ypts[(_curypts.size()-1)-i]= (-1.*_curypts[i]);
-
-
-}
-cout<<"p"<<endl;
-cout<<_xpts<<endl;
-cout<<_ypts<<endl;	
-start= _curxpts.size();
- if( _curxpts[0]==0){ avoidDouble = -1;
- 
- }
+	_xpts.resize(2*_curxpts.size());
+	_ypts.resize(2*_curxpts.size());
+	for(int i = _curxpts.size()-1 ; i>=0 ;i--){
+		_xpts[(_curxpts.size()-1)-i]= double(-1.*_curxpts[i]);
+		_ypts[(_curypts.size()-1)-i]= double(-1.*_curypts[i]);
+	}
+	
+	start= _curxpts.size();
+ 	if( _curxpts[0]==0){
+ 	cout<<"av"<<endl;
+ 	avoidDouble = -1;}
 
 }
 
 for(int i = avoidDouble==0?0:1 ; i<_curxpts.size() ;i++){
-_xpts[i+start+avoidDouble] =_curxpts[i];
-_ypts[i+start+avoidDouble] =_curypts[i];
-
-
+	_xpts[i+start+avoidDouble] =double(_curxpts[i]);
+	_ypts[i+start+avoidDouble] =double(_curypts[i]);
 }
+// resize taking into acount deleted 0 center
 if (avoidDouble!=0){
-_xpts.resize(_xpts.size()-1);
-_ypts.resize(_ypts.size()-1);
+	_xpts.resize(_xpts.size()-1);
+	_ypts.resize(_ypts.size()-1);
 }
 
-
-
-_spline = parameter("spline").toBool();
-
-
-bool integrity=true;
-if(_xpts.size()!=_ypts.size() ){
-integrity=false;
-
+// setup the spline
+cout<<"val"<<endl;
+for (int i = 0 ; i < _xpts.size();i++){
+cout<<_xpts[i]<<endl;
 }
-else{
-for (int i = 1 ; i< _xpts.size();i++){
-if(_xpts[i]<_xpts[i-1]){
-integrity=false;
+				
+_s.set_points(_xpts,_ypts);
 
-break;
-}
-}
-}
-if(!integrity) {throw EssentiaException("wrong xpts or ypts") ;}
-
-
-_splinef->configure("xPoints",_xpts,
-					"yPoints",_ypts,
-					"type","b"
-					);
-					
-cout<<_xpts<<endl;
-cout<<_ypts<<endl;					 
-  
-//   
-}
 }
 
 void waveshaper::compute() {
-
+	
   const std::vector<Real>& signal = _signal.get();
   vector<Real>& signalout = _signalout.get();
 	
@@ -145,9 +134,9 @@ void waveshaper::compute() {
 	
 	
 	if (_spline){ 
-	_splinef->input("x").set(cur);
-	_splinef->output("y").set(signalout[i]);
-	_splinef->compute();
+
+	 signalout[i] =Real(_s(double(cur)));
+
 			}
 	else{
 		if(cur<=_xpts[0]){
@@ -172,7 +161,7 @@ void waveshaper::compute() {
   }
 
 
-
+return;
   
 
 }

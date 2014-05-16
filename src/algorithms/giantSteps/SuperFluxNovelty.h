@@ -39,14 +39,14 @@ class SuperFluxNovelty : public Algorithm {
 	bool _pos;
 
 
-Algorithm* _maxf;
+	Algorithm* _maxf;
 
 
  public:
   SuperFluxNovelty() {
     declareInput(_bands, "bands", "the input bands spectrogram");
     declareOutput(_diffs, "Differences", "SuperFluxNoveltyd input");
-
+	_maxf = AlgorithmFactory::create("MaxFilter");
     
   }
 
@@ -55,7 +55,7 @@ Algorithm* _maxf;
   }
 
   void declareParameters() {
-    declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "(0,inf)", 3);
+    declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "[3,inf)", 3);
 	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 2);
 	declareParameter("Positive", "keep only positive ones", "{false,true}", true);
 }
@@ -96,7 +96,7 @@ class SuperFluxNovelty : public AlgorithmComposite {
   ~SuperFluxNovelty();
 
   void declareParameters() {
-    declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "(0,inf)", 3);
+    declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "[3,inf)", 3);
 	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 5);
   }
 

@@ -19,7 +19,7 @@
 
 #include "SuperFluxNovelty.h"
 #include "essentiamath.h"
-//#define HERKGIL
+
 using namespace std;
 
 namespace essentia {
@@ -37,24 +37,25 @@ void SuperFluxNovelty::configure() {
  	//width has to be odd, then local binW represent half the width
     _binW = parameter("binWidth").toInt();
     if(_binW%2==0)_binW++;
+    _maxf->configure("width",_binW);
+    
+    
 	_binW= int((_binW-1)/2); 
     
 	_frameWi = parameter("frameWidth").toInt();
 
 	_pos = parameter("Positive").toBool();
 
-
+	
+	
 
 
 
 
 }
 
-#ifdef HERKGIL
+
 void SuperFluxNovelty::compute() {
-
-
-
 
   	const TNT::Array2D<Real>& bands = _bands.get();
   	
@@ -66,90 +67,32 @@ void SuperFluxNovelty::compute() {
   throw EssentiaException("SuperFluxNovelty : empty bands or frames");
   }
 	diffs.resize(nFrames);
-	Real maxs = 0;
-	
-	Real cur_diff = 0;
+	vector<Real> maxsBuffer(nBands,0);
 
 
+Real cur_diff;
 
 for (int i = _frameWi ; i< nFrames;i++){
 
 	diffs[i]=0;
+	vector<Real> tmpBuffer(bands[i-_frameWi],bands[i-_frameWi]+nBands);
+	_maxf->input("signal").set(tmpBuffer);
+	_maxf->output("signal").set(maxsBuffer);
+	_maxf->compute();
 	
-	for(int j = _binW ; j<nBands-_binW ; j++){
-
-
-		// if the outgoing term is not last max the new max is faster to compute 
-		//TODO : check relevance and may be go toward a less naive algorithm
-		if(j>_binW && bands[i-_frameWi][j-_binW-1]<maxs){
-			maxs = max(maxs,bands[i-_frameWi][j+_binW]);
-		}
-		
-		else{
-			maxs =bands[i-_frameWi][j-_binW];
-			for (int k = j-_binW+1 ; k<=j+_binW ; k++){
-				maxs = max(maxs,bands[i-_frameWi][k]);
-			}
-		}
-		
-		 cur_diff= bands[i][j]-maxs;
+	for (int j = 0;j<nBands;j++){
+		 cur_diff= bands[i][j]-maxsBuffer[j];
 		if(!(_pos && cur_diff<0)){diffs[i] +=cur_diff ; }
 		
 	}
 	
 	//diffs[i]/=(nBands-2.*_binW);
 }
+return;
 }
 
 
 
-#else
-void SuperFluxNovelty::compute() {
-  	const TNT::Array2D<Real>& bands = _bands.get();
-  	
-	vector<Real>& diffs = _diffs.get();
-
-  int nFrames = bands.dim1();
-  int nBands= bands.dim2();
-  if(!nFrames || !nBands){
-  throw EssentiaException("SuperFluxNovelty : empty bands or frames");
-  }
-	diffs.resize(nFrames);
-	Real maxs = 0;
-	
-	Real cur_diff = 0;
-
-
-
-for (int i = _frameWi ; i< nFrames;i++){
-
-	diffs[i]=0;
-	
-	for(int j = _binW ; j<nBands-_binW ; j++){
-
-
-		// if the outgoing term is not last max the new max is faster to compute 
-		//TODO : check relevance and may be go toward a less naive algorithm
-		if(j>_binW && bands[i-_frameWi][j-_binW-1]<maxs){
-			maxs = max(maxs,bands[i-_frameWi][j+_binW]);
-		}
-		
-		else{
-			maxs =bands[i-_frameWi][j-_binW];
-			for (int k = j-_binW+1 ; k<=j+_binW ; k++){
-				maxs = max(maxs,bands[i-_frameWi][k]);
-			}
-		}
-		
-		 cur_diff= bands[i][j]-maxs;
-		if(!(_pos && cur_diff<0)){diffs[i] +=cur_diff ; }
-		
-	}
-	
-	//diffs[i]/=(nBands-2.*_binW);
-}
-}
-#endif
 
 
 

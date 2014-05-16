@@ -19,9 +19,10 @@
 
 #ifndef ESSENTIA_waveshaper_H
 #define ESSENTIA_waveshaper_H
-
+#include "essentiamath.h"
 #include "algorithmfactory.h"
 #include <complex>
+#include "tk_splineutil.h"
 
 
 namespace essentia {
@@ -33,27 +34,36 @@ class waveshaper : public Algorithm {
   Input<std::vector<Real> > _signal;
   Output<std::vector<Real> > _signalout;
 
-	Algorithm* _splinef;
 
 
+	essentia::util::Tk_spline _s;
 
+std::vector<double> _xpts,_ypts;
+
+	bool _symmetric;
+	bool _normalize;
+	bool _spline;
  public:
   waveshaper()   {
     declareInput(_signal, "array", "the array to be shaped");
     declareOutput(_signalout, "shaped_signal", "shaped");
-    _splinef = AlgorithmFactory::create("Spline");
+
   }
 
+
   void declareParameters() {
-	std::vector<Real> defaultP(2);
-	defaultP[0]=0;
-	defaultP[1]=1;
+  	int si = 15;
+	std::vector<Real> defaultP(si);
+	for(int i = 0 ; i < si ; i++){
+	defaultP[i]=i;
+	}
 
     declareParameter("xPoints", "the x-coordinates where data is specified (the points must be arranged in ascending order and cannot contain duplicates)", "",defaultP);
     declareParameter("yPoints", "the y-coordinates to be interpolated (i.e. the known data)", "",  defaultP);
 	declareParameter("spline","spline mode","{true,false}", true);
 	declareParameter("symmetric","symetric mode","{true,false}", true);
 	declareParameter("normalize","normalisation mode","{true,false}", true);
+	
   }
 
   void configure();
@@ -63,13 +73,8 @@ class waveshaper : public Algorithm {
   static const char* name;
   static const char* description;
   
-  
-  private:
-	std::vector<Real> _xpts,_ypts;
 
-	bool _symmetric;
-	bool _normalize;
-	bool _spline;
+
 
 };
 
@@ -86,6 +91,7 @@ class waveshaper : public StreamingAlgorithmWrapper {
  protected:
   Sink<std::vector<Real> > _signal;
   Source<std::vector<Real> > _signalout;
+  	
 
  public:
   waveshaper() {
