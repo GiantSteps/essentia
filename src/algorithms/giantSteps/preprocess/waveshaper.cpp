@@ -21,9 +21,11 @@
 
 
 using namespace std;
-using namespace essentia;
-using namespace standard;
-using namespace util;
+using namespace essentia::util;
+
+namespace essentia{
+namespace standard{
+
 
 
 
@@ -166,3 +168,7 @@ return;
 
 }
 
+
+
+}// namespace standard
+}// namespace essentia

@@ -22,6 +22,8 @@
 
 #include "algorithmfactory.h"
 
+using namespace std;
+
 namespace essentia {
 namespace standard {
 
@@ -29,8 +31,8 @@ class MaxFilter : public Algorithm {
 
  private:
  
-  Input<std::vector<Real>  > _array;
-  Output<std::vector<Real> > _filtered;
+  Input< vector<Real>  > _array;
+  Output< vector<Real> > _filtered;
 
 
   
@@ -66,49 +68,27 @@ class MaxFilter : public Algorithm {
 } // namespace standard
 } // namespace essentia
 
-#include "streamingalgorithmcomposite.h"
-#include "pool.h"
+#include "streamingalgorithmwrapper.h"
+
 
 namespace essentia {
 namespace streaming {
 
-class MaxFilter : public AlgorithmComposite {
+class MaxFilter : public StreamingAlgorithmWrapper {
 
  protected:
-  SinkProxy<Real> _array;
-  Source<Real> _filtered;
-
-
-  Pool _pool;
-  Algorithm* _poolStorage;
-  standard::Algorithm * _MaxFilter;
+  Sink<vector<Real> > _array;
+  Source<vector<Real> > _filtered;
 
 
  public:
-  MaxFilter();
-  ~MaxFilter();
-
-  void declareParameters() {
-    declareParameter("width", "window size for max filter ", "[3,inf)", 3);
+  MaxFilter(){
+    declareAlgorithm("MaxFilter");
+    declareInput(_array,TOKEN, "signal");
+    declareOutput(_filtered,TOKEN, "signal");
 
   }
 
-  void configure() {
-    _MaxFilter->configure(                                     
-                                     INHERIT("width")
-                                     );
-  }
-
-  void declareProcessOrder() {
-    declareProcessStep(SingleShot(_poolStorage));
-    declareProcessStep(SingleShot(this));
-  }
-
-  AlgorithmStatus process();
-  void reset();
-
-  static const char* name;
-  static const char* description;
 
 };
 

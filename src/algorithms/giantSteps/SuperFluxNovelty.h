@@ -21,6 +21,7 @@
 #define ESSENTIA_SUPERFLUXNOVELTY_H
 
 #include "algorithmfactory.h"
+using namespace std;
 
 namespace essentia {
 namespace standard {
@@ -29,7 +30,7 @@ class SuperFluxNovelty : public Algorithm {
 
  private:
  
-  Input<TNT::Array2D<Real>  > _bands;
+  Input<std::vector< std::vector<Real> >  > _bands;
   Output<std::vector<Real> > _diffs;
 
 
@@ -73,47 +74,53 @@ class SuperFluxNovelty : public Algorithm {
 } // namespace standard
 } // namespace essentia
 
+#include "streamingalgorithmwrapper.h"
 #include "streamingalgorithmcomposite.h"
-#include "pool.h"
 
 namespace essentia {
 namespace streaming {
 
-class SuperFluxNovelty : public AlgorithmComposite {
+class SuperFluxNovelty : public Algorithm {
 
  protected:
-  SinkProxy<Real> _bands;
-  Source<Real> _diffs;
+  Sink< std::vector<Real> > _bands;
+  Source<vector< Real > > _diffs;
+  
+  
+  essentia::standard::Algorithm* _algo;
 
-
-  Pool _pool;
-  Algorithm* _poolStorage;
-  standard::Algorithm * _SuperFluxNovelty;
-
+int bufferSize=3;
 
  public:
-  SuperFluxNovelty();
-  ~SuperFluxNovelty();
+  SuperFluxNovelty(){
+
+    _algo = standard::AlgorithmFactory::create("SuperFluxNovelty");
+    declareInput(_bands, bufferSize,1,"bands","the input bands spectrogram");
+    declareOutput(_diffs,1,1,"Differences","SuperFluxNoveltyd input");
+
+  }
+
+
+
 
   void declareParameters() {
     declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "[3,inf)", 3);
 	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 5);
   }
 
-  void configure() {
-    _SuperFluxNovelty->configure(
-                                     INHERIT("frameWidth"),
-                                     INHERIT("binWidth")
-                                     );
-  }
+void configure(){
+    _bands.setAcquireSize(_algo->parameter("frameWidth").toInt()+1);
+    _bands.setReleaseSize(1);
+    
 
-  void declareProcessOrder() {
-    declareProcessStep(SingleShot(_poolStorage));
-    declareProcessStep(SingleShot(this));
-  }
+    
+   }
 
+// 
   AlgorithmStatus process();
-  void reset();
+  void reset(){
+  _algo->reset();
+  };
 
   static const char* name;
   static const char* description;

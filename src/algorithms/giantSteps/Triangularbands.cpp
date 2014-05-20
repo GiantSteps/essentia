@@ -20,8 +20,8 @@
 #include "Triangularbands.h"
 #include "essentiamath.h"
 
-using namespace essentia;
-using namespace standard;
+namespace essentia{
+namespace standard{
 
 const char* Triangularbands::name = "Triangularbands";
 const char* Triangularbands::description = DOC("This algorithm computes the energy of an input spectrum for an arbitrary number of overlapping Triangular frequency bands. For each band the power-spectrum (mag-squared) is summed.\n"
@@ -83,4 +83,7 @@ void Triangularbands::compute() {
   }
 
 }
+
+}// namespace standard
+}// namespace essentia
 

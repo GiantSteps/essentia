@@ -149,40 +149,4 @@ void MaxFilter::reset() {
 } // namespace essentia
 
 
-#include "poolstorage.h"
-#include "algorithmfactory.h"
 
-namespace essentia {
-namespace streaming {
-
-const char* MaxFilter::name = standard::MaxFilter::name;
-const char* MaxFilter::description = standard::MaxFilter::description;
-
-MaxFilter::MaxFilter() : AlgorithmComposite() {
-
-  _MaxFilter = standard::AlgorithmFactory::create("MaxFilter");
-    declareInput(_array, "signal", "signal to be filtered");
-    declareOutput(_filtered, "signal", "filtered output ");
-}
-
-MaxFilter::~MaxFilter() {
-  delete _MaxFilter;
-
-}
-
-void MaxFilter::reset() {
-  AlgorithmComposite::reset();
-  _MaxFilter->reset();
-}
-
-AlgorithmStatus MaxFilter::process() {
-  if (!shouldStop()) return PASS;
-
-  _MaxFilter->compute();
-
-
-  return FINISHED;
-}
-
-} // namespace streaming
-} // namespace essentia

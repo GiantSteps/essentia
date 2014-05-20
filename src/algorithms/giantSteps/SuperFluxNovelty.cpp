@@ -20,7 +20,7 @@
 #include "SuperFluxNovelty.h"
 #include "essentiamath.h"
 
-using namespace std;
+
 
 namespace essentia {
 namespace standard {
@@ -57,12 +57,15 @@ void SuperFluxNovelty::configure() {
 
 void SuperFluxNovelty::compute() {
 
-  	const TNT::Array2D<Real>& bands = _bands.get();
+  	const vector< vector<Real> >& bands = _bands.get();
   	
 	vector<Real>& diffs = _diffs.get();
 
-  int nFrames = bands.dim1();
-  int nBands= bands.dim2();
+  int nFrames = bands.size();
+  if(!nFrames){
+  throw EssentiaException("SuperFluxNovelty : empty frames");
+  }  
+  int nBands= bands[0].size();
   if(!nFrames || !nBands){
   throw EssentiaException("SuperFluxNovelty : empty bands or frames");
   }
@@ -75,7 +78,7 @@ Real cur_diff;
 for (int i = _frameWi ; i< nFrames;i++){
 
 	diffs[i]=0;
-	vector<Real> tmpBuffer(bands[i-_frameWi],bands[i-_frameWi]+nBands);
+	vector<Real> tmpBuffer(bands[i-_frameWi].begin(),bands[i-_frameWi].end());
 	_maxf->input("signal").set(tmpBuffer);
 	_maxf->output("signal").set(maxsBuffer);
 	_maxf->compute();
@@ -113,8 +116,15 @@ void SuperFluxNovelty::reset() {
 } // namespace essentia
 
 
-#include "poolstorage.h"
-#include "algorithmfactory.h"
+
+
+
+
+
+
+// 
+
+
 
 namespace essentia {
 namespace streaming {
@@ -122,31 +132,33 @@ namespace streaming {
 const char* SuperFluxNovelty::name = standard::SuperFluxNovelty::name;
 const char* SuperFluxNovelty::description = standard::SuperFluxNovelty::description;
 
-SuperFluxNovelty::SuperFluxNovelty() : AlgorithmComposite() {
 
-  _SuperFluxNovelty = standard::AlgorithmFactory::create("SuperFluxNovelty");
-    declareInput(_bands, "bands", "the input bands spectrogram");
-    declareOutput(_diffs, "Differences", "SuperFluxNoveltyd input");
-}
-
-SuperFluxNovelty::~SuperFluxNovelty() {
-  delete _SuperFluxNovelty;
-
-}
-
-void SuperFluxNovelty::reset() {
-  AlgorithmComposite::reset();
-  _SuperFluxNovelty->reset();
-}
 
 AlgorithmStatus SuperFluxNovelty::process() {
-  if (!shouldStop()) return PASS;
-
-  _SuperFluxNovelty->compute();
+  bool producedData = false;
 
 
-  return FINISHED;
+    AlgorithmStatus status = acquireData();
+    if (status != OK) {
+      // acquireData() returns SYNC_OK if we could reserve both inputs and outputs
+      // being here means that there is either not enough input to process,
+      // or that the output buffer is full, in which cases we need to return from here
+      cout<<"superflux novelty no fed"<<endl;
+      return status;
+    }
+    
+    _algo->input("bands").set(_bands.tokens());
+    _algo->output("diffs").set(_diffs.tokens());
+
+    _algo->compute();
+
+    // give back the tokens that were reserved
+    releaseData();
+
+    return OK;
+  
 }
+
 
 } // namespace streaming
 } // namespace essentia

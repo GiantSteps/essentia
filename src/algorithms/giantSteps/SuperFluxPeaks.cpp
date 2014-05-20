@@ -111,7 +111,7 @@ void SuperFluxPeaks::reset() {
 } // namespace essentia
 
 
-#include "poolstorage.h"
+
 #include "algorithmfactory.h"
 
 namespace essentia {
@@ -147,7 +147,6 @@ AlgorithmStatus SuperFluxPeaks::process() {
  
   //const vector<Real>& signal = _pool.value<vector<Real> >("internal.signal");
 
-  _SuperFluxPeaks->input("signal").set(_pool.value<vector<Real> >("internal.signal"));
 
   _SuperFluxPeaks->compute();
 
