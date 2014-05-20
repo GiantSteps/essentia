@@ -109,7 +109,11 @@ class Network {
   Network(streaming::Algorithm* generator, bool takeOwnership = true);
 
   ~Network();
+// Hack Giantstep, asynchronous execution of Network
 
+
+void init();
+void runStack(const bool endOfStream=true);
   void run();
 
   /**
