@@ -22,6 +22,7 @@
 
 #include "streamingalgorithm.h"
 
+using namespace std;
 namespace essentia {
 namespace streaming {
 
