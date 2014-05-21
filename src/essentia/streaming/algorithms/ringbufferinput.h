@@ -17,22 +17,22 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-#ifndef ESSENTIA_STREAMING_RingBufferRt_H
-#define ESSENTIA_STREAMING_RingBufferRt_H
+#ifndef ESSENTIA_STREAMING_RINGBUFFERINPUT_H
+#define ESSENTIA_STREAMING_RINGBUFFERINPUT_H
 
 #include "streamingalgorithm.h"
 
 namespace essentia {
 namespace streaming {
 
-class RingBufferRt : public Algorithm {
+class RingBufferInput : public Algorithm {
  protected:
   Source<Real> _output;
   class RingBufferImpl* _impl;
 
  public:
-  RingBufferRt();
-  ~RingBufferRt();
+  RingBufferInput();
+  ~RingBufferInput();
 
   void add(Real* inputData, int size);
 
@@ -57,4 +57,4 @@ class RingBufferRt : public Algorithm {
 } // namespace streaming
 } // namespace essentia
 
-#endif // ESSENTIA_STREAMING_RingBufferRt_H
+#endif // ESSENTIA_STREAMING_RINGBUFFERINPUT_H

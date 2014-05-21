@@ -18,7 +18,7 @@
  */
 
 #include "RingBufferRt.h"
-#include "ringbufferimpl.h"
+
 #include "sourcebase.h"
 #include "atomic.h"
 
@@ -49,41 +49,8 @@ void RingBufferRt::configure()
 	_impl = new RingBufferImpl(RingBufferImpl::kAvailable,parameter("bufferSize").toInt());
 }
 
-void RingBufferRt::add(Real* inputData, int size)
-{
-	//std::cerr << "adding " << size << " to ringbuffer with space " << _impl->_space << std::endl;
-	int added = _impl->add(inputData,size);
-	if (added < size) throw EssentiaException("Not enough space in ringbuffer at input");
-}
 
-AlgorithmStatus RingBufferRt::process() {
-  //std::cerr << "RingBufferRt waiting" << std::endl;
-  _impl->waitAvailable();
-  //std::cerr << "RingBufferRt waiting done" << std::endl;
 
-  AlgorithmStatus status = acquireData();
-
-  if (status != OK) {
-    //std::cerr << "leaving the RingBufferRt while loop" << std::endl;
-    if (status == NO_OUTPUT) throw EssentiaException("internal error: output buffer full");
-    return status;
-  }
-
-  vector<AudioSample>& outputSignal = _output.tokens();
-  AudioSample* outputData = &(outputSignal[0]);
-  int outputSize = outputSignal.size();
-
-  //std::cerr << "RingBufferRt getting" << outputSize << endl;
-  int size = _impl->get(outputData, outputSize);
-  //std::cerr << "got " << size << " from ringbuffer with space " << _impl->_space << std::endl;
-
-  _output.setReleaseSize(size);
-  releaseData();
-
-  assert(size);
-
-  return OK;
-}
 
 void RingBufferRt::reset() {
   Algorithm::reset();
