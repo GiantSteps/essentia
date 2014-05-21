@@ -21,7 +21,7 @@
 #define ESSENTIA_STREAMING_RINGBUFFERINPUT_H
 
 #include "streamingalgorithm.h"
-
+using namespace std;
 namespace essentia {
 namespace streaming {
 

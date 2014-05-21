@@ -73,9 +73,9 @@ AlgorithmStatus RingBufferInput::process() {
   AudioSample* outputData = &(outputSignal[0]);
   int outputSize = outputSignal.size();
 
-  //std::cerr << "ringbufferinput getting" << outputSize << endl;
+  std::cerr << "ringbufferinput getting" << outputSize << endl;
   int size = _impl->get(outputData, outputSize);
-  //std::cerr << "got " << size << " from ringbuffer with space " << _impl->_space << std::endl;
+  std::cerr << "got " << size << " from ringbuffer with space " << _impl->_space << std::endl;
 
   _output.setReleaseSize(size);
   releaseData();

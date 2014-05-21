@@ -22,7 +22,7 @@
 #include "sourcebase.h"
 #include "atomic.h"
 
-using namespace std;
+
 
 namespace essentia {
 namespace streaming {
@@ -73,9 +73,9 @@ AlgorithmStatus RingBufferInput::process() {
   AudioSample* outputData = &(outputSignal[0]);
   int outputSize = outputSignal.size();
 
-  cout << "ringbufferinput getting" << outputSize << endl;
+  //cout << "ringbufferinput getting" << outputSize << endl;
   int size = _impl->get(outputData, outputSize);
-  cout << "got " << size << " from ringbuffer with space " << _impl->_space << std::endl;
+  //cout << "got " << size << " from ringbuffer with space " << _impl->_space << std::endl;
 
   _output.setReleaseSize(size);
   releaseData();
