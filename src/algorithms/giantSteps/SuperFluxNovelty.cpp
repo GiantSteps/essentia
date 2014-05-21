@@ -68,7 +68,7 @@ void SuperFluxNovelty::compute() {
   
 // ONLINE MODE all results are advanced by frame width, allow easier streaming mode
 // For better accuracy
-cout<<nFrames <<"et " << _frameWi << "b  " << bands.size()<<endl;
+cout<<nFrames <<"et " << _frameWi << "b  " << nBands<<endl;
 if (_online){diffs.resize(nFrames-_frameWi);	}
 else { diffs.resize(nFrames);}
 

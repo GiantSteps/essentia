@@ -84,7 +84,7 @@ if (!isStream)peaks.resize(size);
 	Real peakTime = 0;
 	for( int i =0 ; i < size;i++){
 		if(_rawMode){peaks[i]=0;}
-		cout << signal[i] <<"  " << maxs[i] <<"  " << avg[i] << endl;
+		//cout << signal[i] <<"  " << maxs[i] <<"  " << avg[i] << endl;
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
 			peakTime = i/frameRate;
 			if((nDetec>0 && peakTime-peaks[nDetec-1]>_combine)  ||  nDetec ==0) {

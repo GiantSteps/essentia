@@ -81,6 +81,7 @@ class Triangularbands : public StreamingAlgorithmWrapper {
     declareAlgorithm("Triangularbands");
     declareInput(_spectrumInput, TOKEN, "spectrum");
     declareOutput(_bandsOutput, TOKEN, "bands");
+
   }
 };
 
