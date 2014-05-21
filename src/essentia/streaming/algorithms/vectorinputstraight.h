@@ -40,14 +40,14 @@ class VectorInputStraight : public Algorithm {
   VectorInputStraight(const std::vector<TokenType>* input=0, bool own = false)
     : _inputVector(input), _ownVector(own) {
     setName("VectorInputStraight");
-    declareOutput(_output,  "data", "the values read from the vector");
+    declareOutput(_output,1,1,  "data", "the values read from the vector");
     reset();
   }
 
   VectorInputStraight(std::vector<TokenType>* input, bool own = false)
     : _inputVector(input), _ownVector(own) {
     setName("VectorInputStraight");
-    declareOutput(_output,  "data", "the values read from the vector");
+    declareOutput(_output, 1,1 "data", "the values read from the vector");
     reset();
   }
 
