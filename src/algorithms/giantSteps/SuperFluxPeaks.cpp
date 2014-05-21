@@ -137,7 +137,7 @@ AlgorithmStatus SuperFluxPeaks::process() {
 	  // acquireData() returns SYNC_OK if we could reserve both inputs and outputs
 	  // being here means that there is either not enough input to process,
 	  // or that the output buffer is full, in which cases we need to return from here
-	  cout << "peaks no fed" << endl;
+	  // cout << "peaks no fed" << endl;
 	  return status;
 	}
 cout << "peaks fed" << endl;

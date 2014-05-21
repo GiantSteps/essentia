@@ -89,7 +89,7 @@ class SuperFluxNovelty : public Algorithm {
   
   essentia::standard::Algorithm* _algo;
 
-int bufferSize=3;
+int bufferSize=1;
 
  public:
   SuperFluxNovelty(){
@@ -104,7 +104,7 @@ int bufferSize=3;
 
   void declareParameters() {
     declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "[3,inf)", 3);
-	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 5);
+	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 2);
 	declareParameter("Online", "realign output with audio by frameWidth : if using streaming mode set it to true, else for static precision measurement, use false", "{false,true}", true);
   }
    
