@@ -89,7 +89,7 @@ class SuperFluxNovelty : public Algorithm {
   
   essentia::standard::Algorithm* _algo;
 
-int bufferSize=1;
+int bufferSize=3;
 
  public:
   SuperFluxNovelty(){
