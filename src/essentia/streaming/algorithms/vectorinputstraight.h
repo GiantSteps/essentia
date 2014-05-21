@@ -47,7 +47,7 @@ class VectorInputStraight : public Algorithm {
   VectorInputStraight(std::vector<TokenType>* input, bool own = false)
     : _inputVector(input), _ownVector(own) {
     setName("VectorInputStraight");
-    declareOutput(_output, 1,1 "data", "the values read from the vector");
+    declareOutput(_output, 1,1, "data", "the values read from the vector");
     reset();
   }
 

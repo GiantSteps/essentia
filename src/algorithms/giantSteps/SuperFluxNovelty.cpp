@@ -61,14 +61,14 @@ void SuperFluxNovelty::compute() {
   throw EssentiaException("SuperFluxNovelty : empty frames");
   }  
   int nBands= bands[0].size();
-  if(!nFrames || !nBands){
-  throw EssentiaException("SuperFluxNovelty : empty bands or frames");
+  if(!nBands){
+  throw EssentiaException("SuperFluxNovelty : empty bands ");
   }
   
   
 // ONLINE MODE all results are advanced by frame width, allow easier streaming mode
 // For better accuracy
-cout<<nFrames <<"et " << _frameWi<<endl;
+cout<<nFrames <<"et " << _frameWi << "b  " << _bands.size()<<endl;
 if (_online){diffs.resize(nFrames-_frameWi);	}
 else { diffs.resize(nFrames);}
 
