@@ -73,11 +73,20 @@ void Triangularbands::compute() {
       endBin = spectrum.size();
     }
 
-    for (int j=startBin; j<endBin; j++) {
+    for (int j=startBin; j<=endBin; j++) {
+    Real TriangF;
+    if(midBin!=startBin && midBin!= endBin){
     	Real mid = (midBin - startBin);
-    	Real TriangF = j<midBin? (j-startBin)/mid : 1-(j-midBin)/mid;
-    	
+    	TriangF = j<midBin? (j-startBin)/mid : 1-(j-midBin)/mid;
+	}
+	else if (startBin== endBin){
+		TriangF = 1;
+	}
+	else{
+		TriangF = 0.5;
+	}
       Real magSquared = TriangF * TriangF * spectrum[j] * spectrum[j];
+
       bands[i] += sqrt(magSquared);
     }
   }

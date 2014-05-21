@@ -26,7 +26,7 @@ using namespace std;
 namespace essentia {
 namespace standard {
 
-class SuperFluxNovelty : public Algorithm {
+class SuperFluxNovelty : public Algorithm{
 
  private:
  
@@ -37,7 +37,7 @@ class SuperFluxNovelty : public Algorithm {
   
   	int _binW;
   	int _frameWi;
-	bool _pos;
+	bool _online;
 
 
 	Algorithm* _maxf;
@@ -58,7 +58,7 @@ class SuperFluxNovelty : public Algorithm {
   void declareParameters() {
     declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "[3,inf)", 3);
 	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 2);
-	declareParameter("Positive", "keep only positive ones", "{false,true}", true);
+	declareParameter("Online", "realign output with audio by frameWidth : if using streaming mode set it to true, else for static precision measurement, use false", "{false,true}", false);
 }
 
   void reset();
@@ -74,17 +74,17 @@ class SuperFluxNovelty : public Algorithm {
 } // namespace standard
 } // namespace essentia
 
-#include "streamingalgorithmwrapper.h"
-#include "streamingalgorithmcomposite.h"
 
+#include "streamingalgorithm.h"
+// #include "streamingalgorithmcomposite.h"
 namespace essentia {
 namespace streaming {
 
 class SuperFluxNovelty : public Algorithm {
 
  protected:
-  Sink< std::vector<Real> > _bands;
-  Source<vector< Real > > _diffs;
+  Sink< vector<Real> > _bands;
+   Source<Real  > _diffs;
   
   
   essentia::standard::Algorithm* _algo;
@@ -93,10 +93,9 @@ int bufferSize=3;
 
  public:
   SuperFluxNovelty(){
-
     _algo = standard::AlgorithmFactory::create("SuperFluxNovelty");
     declareInput(_bands, bufferSize,1,"bands","the input bands spectrogram");
-    declareOutput(_diffs,1,1,"Differences","SuperFluxNoveltyd input");
+    declareOutput(_diffs,1,"Differences","SuperFlux");
 
   }
 
@@ -106,20 +105,20 @@ int bufferSize=3;
   void declareParameters() {
     declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "[3,inf)", 3);
 	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 5);
+	declareParameter("Online", "realign output with audio by frameWidth : if using streaming mode set it to true, else for static precision measurement, use false", "{false,true}", true);
+  }
+   
+void configure(const ParameterMap& params) {
+     _algo->configure(params);
+     this->setParameters(params);
+	_bands.setAcquireSize(_algo->parameter("frameWidth").toInt()+1);
+    _bands.setReleaseSize(1);
+
   }
 
-void configure(){
-    _bands.setAcquireSize(_algo->parameter("frameWidth").toInt()+1);
-    _bands.setReleaseSize(1);
-    
-
-    
-   }
-
-// 
   AlgorithmStatus process();
   void reset(){
-  _algo->reset();
+//   _algo->reset();
   };
 
   static const char* name;

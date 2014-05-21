@@ -285,7 +285,7 @@ void Network::runStack(const bool endOfStream){
 
 void Network::run() {
 
-
+init();
   // keep a map of total tokens produced by each output of each algorithm, that
   // way we can know whether an algorithm produced data or not and re-run it if
   // necessary
@@ -333,7 +333,7 @@ void Network::run() {
     //E_DEBUG(EScheduler, dash << " Buffer states after running generator " << dash);
     //printBufferFillState();
 #endif
-
+	runStack(endOfStream);
 
     E_DEBUG(EScheduler, dash << " Buffer states after running the generator and all the nodes " << dash);
     printBufferFillState();

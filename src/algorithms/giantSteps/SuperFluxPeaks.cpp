@@ -33,79 +33,85 @@ const char* SuperFluxPeaks::description = DOC("get Peaks");
 
 
 void SuperFluxPeaks::configure() {
-		frameRate = parameter("frameRate").toReal();
-        _pre_avg = int(frameRate* parameter("pre_avg").toReal() / 1000.);
-        _pre_max = int(frameRate * parameter("pre_max").toReal() / 1000.);
-        
-        // convert to seconds
-    	_combine = parameter("combine").toReal()/1000.;
+	frameRate = parameter("frameRate").toReal();
+	_pre_avg = int(frameRate* parameter("pre_avg").toReal() / 1000.);
+	_pre_max = int(frameRate * parameter("pre_max").toReal() / 1000.);
+	
+	// convert to seconds
+	_combine = parameter("combine").toReal()/1000.;
 
-_threshold = parameter("threshold").toInt();
+	_threshold = parameter("threshold").toInt();
+	
+	_rawMode = parameter("rawmode").toBool();
 
-		_movAvg->configure("size",_pre_avg+1);
-		_maxf->configure("width",_pre_max+1);
+	_movAvg->configure("size",_pre_avg+1);
+	_maxf->configure("width",_pre_max+1);
 
 
 }
 
 
 void SuperFluxPeaks::compute() {
-  const vector<Real>& signal = _signal.get();
-vector<Real>& peaks = _peaks.get();
-  if (signal.empty()) {
-peaks.resize(0);
-    return;
-  }
+  	const vector<Real>& signal = _signal.get();
+	vector<Real>& peaks = _peaks.get();
+  	if (signal.empty()) {
+		peaks.resize(0);
+    	return;
+  	}
 
-int size = signal.size();
-
-
-vector<Real> avg(size);
-
-_movAvg->input("signal").set(signal);
-_movAvg->output("signal").set(avg);
-_movAvg->compute();
-
-vector<Real> maxs(size);
-
-_maxf->input("signal").set(signal);
-_maxf->output("signal").set(maxs);
-_maxf->compute();
+	int size = signal.size();
 
 
-peaks.resize(size);
-int nDetec=0;
-Real peakTime = 0;
-for( int i =0 ; i < size;i++){
-	if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
-		peakTime = i/frameRate;
-		if((nDetec>0 && peakTime-peaks[nDetec-1]>_combine)  ||  nDetec ==0) peaks[nDetec]=peakTime;
+	vector<Real> avg(size);
 
-		nDetec++;
+	_movAvg->input("signal").set(signal);
+	_movAvg->output("signal").set(avg);
+	_movAvg->compute();
+
+	vector<Real> maxs(size);
+
+	_maxf->input("signal").set(signal);
+	_maxf->output("signal").set(maxs);
+	_maxf->compute();
+
+bool isStream = size <= max(_pre_avg,_pre_max )+1;
+
+if (!isStream)peaks.resize(size);
+	// Streaming mode hack, when >0 onset detected
+
+	
+	int nDetec=0;
+	Real peakTime = 0;
+	for( int i =0 ; i < size;i++){
+		if(_rawMode){peaks[i]=0;}
+		cout << signal[i] <<"  " << maxs[i] <<"  " << avg[i] << endl;
+		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
+			peakTime = i/frameRate;
+			if((nDetec>0 && peakTime-peaks[nDetec-1]>_combine)  ||  nDetec ==0) {
+				if(_rawMode){
+				peaks[i]=1;
+				}
+				else{
+					peaks[nDetec]=peakTime;
+					
+					}
+				nDetec++;
+			}
+		}
+		
+		
 	}
 
-}
-
-peaks.resize(nDetec);
+	if(!_rawMode)peaks.resize(nDetec);
 
 return;
-
-
-  
+ 
 }
 
 
-void SuperFluxPeaks::reset() {
-  Algorithm::reset();
-
-}
 
 
-// TODO in the case of lower accuracy in evaluation
-// implement post-processing steps for methods in OnsetDetection, which required it
-// wrapping the OnsetDetection algo
-// - smoothing?
-// - etc., whatever was requiered in original matlab implementations
+
 
 } // namespace standard
 } // namespace essentia
@@ -120,38 +126,32 @@ namespace streaming {
 const char* SuperFluxPeaks::name = standard::SuperFluxPeaks::name;
 const char* SuperFluxPeaks::description = standard::SuperFluxPeaks::description;
 
-SuperFluxPeaks::SuperFluxPeaks() : AlgorithmComposite() {
-
-  _SuperFluxPeaks = standard::AlgorithmFactory::create("SuperFluxPeaks");
-
-
-  declareInput(_signal, 1, "signal", "the input signal");   // 1
-  declareOutput(_peaks, 1, "peaks", "Onsets"); // 0
-
-
-}
-
-SuperFluxPeaks::~SuperFluxPeaks() {
-  delete _SuperFluxPeaks;
-
-}
-
-void SuperFluxPeaks::reset() {
-  AlgorithmComposite::reset();
-  _SuperFluxPeaks->reset();
-}
 
 AlgorithmStatus SuperFluxPeaks::process() {
-  if (!shouldStop()) return PASS;
 
- 
-  //const vector<Real>& signal = _pool.value<vector<Real> >("internal.signal");
+ 	bool producedData = false;
 
 
-  _SuperFluxPeaks->compute();
+	AlgorithmStatus status = acquireData();
+	if (status != OK) {
+	  // acquireData() returns SYNC_OK if we could reserve both inputs and outputs
+	  // being here means that there is either not enough input to process,
+	  // or that the output buffer is full, in which cases we need to return from here
+	  cout << "peaks no fed" << endl;
+	  return status;
+	}
+cout << "peaks fed" << endl;
+	_algo->input("novelty").set(_signal.tokens());
+	_algo->output("peaks").set(_peaks.tokens());
 
+	_algo->compute();
+	cout << _peaks.tokens()[0] << endl;
 
-  return FINISHED;
+	// give back the tokens that were reserved
+	releaseData();
+
+	return OK;
+  
 }
 
 } // namespace streaming

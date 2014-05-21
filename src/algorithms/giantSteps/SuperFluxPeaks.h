@@ -21,28 +21,29 @@
 #define ESSENTIA_SuperFluxPeaks_H
 
 #include "algorithmfactory.h"
-
+using namespace std;
 namespace essentia {
 namespace standard {
 
 class SuperFluxPeaks : public Algorithm {
 
  private:
-  Input<std::vector<Real> > _signal;
-  Output<std::vector<Real> > _peaks;
+ 	Input<std::vector<Real> > _signal;
+ 	Output<std::vector<Real> > _peaks;
  
-Algorithm* _movAvg;
-Algorithm* _maxf;
+	Algorithm* _movAvg;
+	Algorithm* _maxf;
   
- int _pre_avg;
-int _pre_max;
-Real _combine;
-Real _threshold;
+ 	int _pre_avg;
+	int _pre_max;
+	Real _combine;
+	Real _threshold;
 
 
-  int hopSize;
-  Real frameRate;
+  	int hopSize;
+  	Real frameRate;
 
+	bool _rawMode;
 
 
 
@@ -56,9 +57,8 @@ Real _threshold;
     
   }
 
-  ~SuperFluxPeaks() {
 
-  }
+
 
   void declareParameters() {
 	declareParameter("frameRate", "frameRate", "(0,inf)", 172);
@@ -66,16 +66,15 @@ Real _threshold;
 	declareParameter("combine", "ms for onset combination", "(0,inf)", 30);
     declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100);
 	declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30);
+	declareParameter("rawmode", "output mode: if true, returns array of same size as novelty function, with 1 where peaks stands, if false, output list of peaks instants", "{true,false}", false);
 
 
 }
 
-  void reset();
+  void reset() {Algorithm::reset();};
   void configure();
   void compute();
 
-  void computeInfoGain();
-  void computeBeatEmphasis();
 
   static const char* name;
   static const char* version;
@@ -85,53 +84,53 @@ Real _threshold;
 } // namespace standard
 } // namespace essentia
 
-#include "streamingalgorithmcomposite.h"
-#include "pool.h"
+
+
 
 namespace essentia {
 namespace streaming {
 
-class SuperFluxPeaks : public AlgorithmComposite {
+class SuperFluxPeaks : public Algorithm {
 
  protected:
-  SinkProxy<Real> _signal;
-  SourceProxy<Real> _peaks;
+  Sink<Real> _signal;
+  Source<Real> _peaks;
 
-
-  Pool _pool;
-  Algorithm* _poolStorage;
-  standard::Algorithm * _SuperFluxPeaks;
+  standard::Algorithm * _algo;
 
 
  public:
-  SuperFluxPeaks();
-  ~SuperFluxPeaks();
+  SuperFluxPeaks(){
+  
+    _algo = standard::AlgorithmFactory::create("SuperFluxPeaks");
+    declareInput(_signal, 3,1,"novelty","the input bands spectrogram");
+    declareOutput(_peaks,1,1,"peaks","SuperFlux");
+  };
+  
 
   void declareParameters() {
-
+	declareParameter("frameRate", "frameRate", "(0,inf)", 172);
     declareParameter("threshold", "threshold for peak-picking", "(0,inf)", 1.25);
 	declareParameter("combine", "ms for onset combination", "(0,inf)", 30);
     declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100);
 	declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30);
+	declareParameter("rawmode", "output mode: if true, returns array of same size as novelty function, with 1 where peaks stands, if false, output list of peaks instants", "{true,false}", true);
+
   }
 
-  void configure() {
-    _SuperFluxPeaks->configure(
-                                     INHERIT("threshold"),
-                                     INHERIT("combine"),
-                                     INHERIT("pre_avg"),
-                                     INHERIT("combine")
-                                     
-                                     );
+  void configure() {}
+
+void configure(const ParameterMap& params) {
+    _algo->configure(params);
+    this->setParameters(params);
+    _signal.setAcquireSize(_algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000);
+    _signal.setReleaseSize(1);
+    
   }
 
-  void declareProcessOrder() {
-    declareProcessStep(SingleShot(_poolStorage));
-    declareProcessStep(SingleShot(this));
-  }
 
   AlgorithmStatus process();
-  void reset();
+
 
   static const char* name;
   static const char* description;

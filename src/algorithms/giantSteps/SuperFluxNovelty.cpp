@@ -44,12 +44,7 @@ void SuperFluxNovelty::configure() {
     
 	_frameWi = parameter("frameWidth").toInt();
 
-	_pos = parameter("Positive").toBool();
-
-	
-	
-
-
+	_online = parameter("Online").toBool();
 
 
 }
@@ -69,7 +64,19 @@ void SuperFluxNovelty::compute() {
   if(!nFrames || !nBands){
   throw EssentiaException("SuperFluxNovelty : empty bands or frames");
   }
-	diffs.resize(nFrames);
+  
+  
+// ONLINE MODE all results are advanced by frame width, allow easier streaming mode
+// For better accuracy
+cout<<nFrames <<"et " << _frameWi<<endl;
+if (_online){diffs.resize(nFrames-_frameWi);	}
+else { diffs.resize(nFrames);}
+
+	int onlinestep = _online?_frameWi:0;	
+
+
+
+
 	vector<Real> maxsBuffer(nBands,0);
 
 
@@ -78,14 +85,17 @@ Real cur_diff;
 for (int i = _frameWi ; i< nFrames;i++){
 
 	diffs[i]=0;
-	vector<Real> tmpBuffer(bands[i-_frameWi].begin(),bands[i-_frameWi].end());
-	_maxf->input("signal").set(tmpBuffer);
+	//vector<Real> tmpBuffer(bands[i-_frameWi].begin(),bands[i-_frameWi].end());
+	_maxf->input("signal").set(bands[i-_frameWi]);
 	_maxf->output("signal").set(maxsBuffer);
 	_maxf->compute();
 	
+
 	for (int j = 0;j<nBands;j++){
 		 cur_diff= bands[i][j]-maxsBuffer[j];
-		if(!(_pos && cur_diff<0)){diffs[i] +=cur_diff ; }
+		if(cur_diff>0){
+		
+		diffs[i-onlinestep] +=cur_diff ; }
 		
 	}
 	
@@ -143,12 +153,11 @@ AlgorithmStatus SuperFluxNovelty::process() {
       // acquireData() returns SYNC_OK if we could reserve both inputs and outputs
       // being here means that there is either not enough input to process,
       // or that the output buffer is full, in which cases we need to return from here
-      cout<<"superflux novelty no fed"<<endl;
       return status;
     }
-    
+
     _algo->input("bands").set(_bands.tokens());
-    _algo->output("diffs").set(_diffs.tokens());
+    _algo->output("Differences").set(_diffs.tokens());
 
     _algo->compute();
 
