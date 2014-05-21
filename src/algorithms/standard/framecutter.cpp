@@ -270,7 +270,7 @@ AlgorithmStatus FrameCutter::process() {
 
     releaseData();
     _streamIndex += howmuch;
-
+		EXEC_DEBUG("avance in stream");
     return OK;
   }
 
@@ -282,7 +282,10 @@ AlgorithmStatus FrameCutter::process() {
 
   // we need this check anyway because we might be at the very end of the stream and try to acquire 0
   // for our last frame, which will unfortunately work, so just get rid of this case right now
-  if (available == 0) return NO_INPUT;
+  if (available == 0) {
+  EXEC_DEBUG("no tokens available");
+  return NO_INPUT;
+  }
 
   if (_startIndex < 0) {
     // left zero-padding and only acquire  as much as _frameSize + startIndex tokens and should release zero
@@ -293,6 +296,7 @@ AlgorithmStatus FrameCutter::process() {
 
   // if there are not enough tokens in the stream (howmuch < available):
   if (acquireSize >= available) { // has to be >= in case the size of the audio fits exactly with frameSize & hopSize
+    EXEC_DEBUG("no enough tokens available");
     if (!shouldStop()) return NO_INPUT; // not end of stream -> return and wait for more data to come
 
     acquireSize = available; // need to acquire what's left
