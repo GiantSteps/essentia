@@ -34,7 +34,7 @@ const char* RingBufferInput::description = DOC(
 
 RingBufferInput::RingBufferInput():_impl(0)
 {
-  declareOutput(_output, 1024, "signal", "data source of what's coming from the ringbuffer");
+  declareOutput(_output, 4096, "signal", "data source of what's coming from the ringbuffer");
   _output.setBufferType(BufferUsage::forAudioStream);
 }
 
@@ -64,7 +64,7 @@ AlgorithmStatus RingBufferInput::process() {
   AlgorithmStatus status = acquireData();
 
   if (status != OK) {
-    //std::cerr << "leaving the ringbufferinput while loop" << std::endl;
+    std::cout << "leaving the ringbufferinput while loop" << std::endl;
     if (status == NO_OUTPUT) throw EssentiaException("internal error: output buffer full");
     return status;
   }
