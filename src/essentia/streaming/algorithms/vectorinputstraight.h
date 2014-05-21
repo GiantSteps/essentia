@@ -102,10 +102,11 @@ class VectorInputStraight : public Algorithm {
       return NO_INPUT;
     }
 
-    std::vector<TokenType>* dest = (std::vector<TokenType>*)_output.getFirstToken();
-    const std::vector<TokenType>* src = _inputVector;
-    int howmuch = _inputVector->size();
-    fastcopy(dest, src, howmuch);
+      std::vector<TokenType>* dest = (std::vector<TokenType>*)_output.getFirstToken();
+      dest->resize(_inputVector->size());
+      for (int i = 0 ; i < _inputVector->size(); i ++){
+          dest->at(i)=_inputVector->at(i);
+      }
 
 
     releaseData();
