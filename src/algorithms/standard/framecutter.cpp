@@ -252,7 +252,7 @@ void FrameCutter::configure() {
 AlgorithmStatus FrameCutter::process() {
   bool lastFrame = false;
 
-  EXEC_DEBUG("process()");
+  EXEC_DEBUG("processouz()");
 
   // if _streamIndex < _startIndex, we need to advance into the stream until we
   // arrive at _startIndex
