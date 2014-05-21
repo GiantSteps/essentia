@@ -47,6 +47,8 @@ void RingBufferInput::configure()
 {
 	delete _impl;
 	_impl = new RingBufferImpl(RingBufferImpl::kAvailable,parameter("bufferSize").toInt());
+	
+	_output.setAcquireSize(parameter("blockSize").toInt());
 }
 
 void RingBufferInput::add(Real* inputData, int size)

@@ -45,6 +45,7 @@ class RingBufferInput : public Algorithm {
 
   void declareParameters() {
     declareParameter("bufferSize", "the size of the ringbuffer", "", 8192);
+    declareParameter("blockSize", "the out blocksize of the ringbuffer", "", 1024);
   }
 
   void configure();
