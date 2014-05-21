@@ -259,6 +259,7 @@ AlgorithmStatus FrameCutter::process() {
   if (_streamIndex < _startIndex) {
     // to make sure we can skip that many, use frameSize (buffer has been resized
     // to be able to accomodate at least that many sample before starting processing)
+    EXEC_DEBUG("avance in stream");
     int skipSize = _frameSize;
     int howmuch = min(_startIndex - _streamIndex, skipSize);
     _audio.setAcquireSize(howmuch);
@@ -266,11 +267,15 @@ AlgorithmStatus FrameCutter::process() {
     _frames.setAcquireSize(0);
     _frames.setReleaseSize(0);
 
-    if (acquireData() != OK) return NO_INPUT;
+    if (acquireData() != OK){
+    EXEC_DEBUG("cant acquire" << howmuch);
+    return NO_INPUT;
+    
+    }
 
     releaseData();
     _streamIndex += howmuch;
-		EXEC_DEBUG("avance in stream");
+		
     return OK;
   }
 
