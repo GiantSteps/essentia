@@ -87,6 +87,7 @@ if(_rawMode){
 		peaks[i]=0;
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
 			if((lastPidx>=0 && (i-lastPidx)>_combine*frameRate)  ||  lastPidx ==-1) {
+			E_DEBUG(EAlgorithm,"peakDetected");
 				peaks[i]=1;	
 				lastPidx = i;
 			}
