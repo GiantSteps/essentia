@@ -108,9 +108,8 @@ int bufferSize=3;
 	declareParameter("Online", "realign output with audio by frameWidth : if using streaming mode set it to true, else for static precision measurement, use false", "{false,true}", true);
   }
    
-void configure(const ParameterMap& params) {
-     _algo->configure(params);
-     this->setParameters(params);
+void configure() {
+     _algo->configure(_params);
 	_bands.setAcquireSize(_algo->parameter("frameWidth").toInt()+1);
     _bands.setReleaseSize(1);
 
