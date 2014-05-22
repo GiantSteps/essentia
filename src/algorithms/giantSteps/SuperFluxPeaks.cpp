@@ -74,8 +74,9 @@ void SuperFluxPeaks::compute() {
 	_maxf->output("signal").set(maxs);
 	_maxf->compute();
 
-bool isStream = size <= max(_pre_avg,_pre_max )+1;
 
+bool isStream = size <= max(_pre_avg,_pre_max )+1;
+E_DEBUG(EAlgorithm,"sfpeaks is Stream" << isStream << "size " << size);
 if (!isStream)peaks.resize(size);
 	// Streaming mode hack, when >0 onset detected
 
@@ -145,7 +146,7 @@ cout << "peaks fed" << endl;
 	_algo->output("peaks").set(_peaks.tokens());
 
 	_algo->compute();
-	cout << _peaks.tokens()[0] << endl;
+	
 
 	// give back the tokens that were reserved
 	releaseData();
