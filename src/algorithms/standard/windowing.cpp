@@ -70,7 +70,8 @@ void Windowing::compute() {
 
   if (signal.size() != _window.size()) {
     _window.resize(signal.size());
-    cout << "window" << signal.size() <<endl;
+    
+    E_DEBUG( EAlgorithm, "signal different than window size" << signal.size());
     createWindow(parameter("type").toLower());
   }
 
