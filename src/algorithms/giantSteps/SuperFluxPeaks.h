@@ -118,13 +118,8 @@ class SuperFluxPeaks : public Algorithm {
 
   }
 
-  void configure() {
-  
-  int aqS = _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000;
-    EXEC_DEBUG("setAcquireSize" << aqS);
-    _signal.setAcquireSize(aqS);
-    _signal.setReleaseSize(1);
-  }
+
+  // link algo parameter with streaming burffer options
 
 void configure(const ParameterMap& params) {
     _algo->configure(params);

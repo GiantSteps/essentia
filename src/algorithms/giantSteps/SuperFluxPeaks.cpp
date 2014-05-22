@@ -78,7 +78,7 @@ void SuperFluxPeaks::compute() {
 bool isStream = size <= max(_pre_avg,_pre_max )+1;
 E_DEBUG(EAlgorithm,"sfpeaks is Stream" << isStream << "size " << size <<"peaksS" << peaks.size());
 E_DEBUG(EAlgorithm,"maxSize" << maxs.size() <<"/" << _pre_max << "mov avgsize " << avg.size()<< "/" << _pre_avg);
-peaks.resize(size);
+if(!isStream)peaks.resize(size);
 	// Streaming mode hack, when >0 onset detected
 
 if(_rawMode){
@@ -87,9 +87,10 @@ if(_rawMode){
 		peaks[i]=0;
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
 			if((lastPidx>=0 && (i-lastPidx)>_combine*frameRate)  ||  lastPidx ==-1) {
-				peaks[i]=1;			
+				peaks[i]=1;	
+				lastPidx = i;
 			}
-			lastPidx = i;
+			
 		}	
 	}
 	
@@ -116,7 +117,7 @@ else{
 peaks.resize(nDetec);
 
 	
-	}
+}
 
 return;
  
@@ -154,10 +155,11 @@ AlgorithmStatus SuperFluxPeaks::process() {
 	  // cout << "peaks no fed" << endl;
 	  return status;
 	}
-
+// 	vector<Real> peaks;
 	_algo->input("novelty").set(_signal.tokens());
 	_algo->output("peaks").set(_peaks.tokens());
-
+// 	_peaks.setAquireSize()
+// 	_peaks.tokens()
 	_algo->compute();
 	
 

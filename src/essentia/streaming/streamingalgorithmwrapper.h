@@ -65,6 +65,7 @@ class StreamingAlgorithmWrapper : public Algorithm {
   void configure(const ParameterMap& params) {
     _algorithm->configure(params);
     this->setParameters(params);
+
   }
 
   void configure() {
