@@ -40,6 +40,7 @@ class RingBufferOutput : public Algorithm {
 
   void declareParameters() {
     declareParameter("bufferSize", "the size of the ringbuffer", "", 8192);
+    declareParameter("blockSize", "the size of the release block", "", 1024);
   }
 
   void configure();

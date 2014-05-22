@@ -42,6 +42,8 @@ void RingBufferOutput::configure()
 {
 	delete _impl;
 	_impl = new RingBufferImpl(RingBufferImpl::kSpace,parameter("bufferSize").toInt());
+	_input.setAcquireSize(parameter("blockSize").toInt());
+	_input.setReleaseSize(parameter("blockSize").toInt());
 }
 
 int RingBufferOutput::get(Real* outputData, int max)
