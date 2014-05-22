@@ -124,20 +124,16 @@ bool _rawmode;
 
 void configure(){
 EXEC_DEBUG("configuring Peaks");
-};
-
-void configure(const ParameterMap& params) {
-
-    _algo->configure(params);
-    this->setParameters(params);
-    int aqS = _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000;
+_algo->configure(this->_params);
+int aqS = _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000;
     EXEC_DEBUG("setAcquireSize" << aqS);
     _signal.setAcquireSize(aqS);
     _signal.setReleaseSize(1);
     
     _rawmode = _algo->parameter("rawmode").toBool();
-    
-  };
+};
+
+
 
 
   AlgorithmStatus process();
