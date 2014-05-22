@@ -76,34 +76,47 @@ void SuperFluxPeaks::compute() {
 
 
 bool isStream = size <= max(_pre_avg,_pre_max )+1;
-E_DEBUG(EAlgorithm,"sfpeaks is Stream" << isStream << "size " << size);
-if (!isStream)peaks.resize(size);
+E_DEBUG(EAlgorithm,"sfpeaks is Stream" << isStream << "size " << size <<"peaksS" << peaks.size());
+E_DEBUG(EAlgorithm,"maxSize" << maxs.size() <<"/" << _pre_max << "mov avgsize " << avg.size()<< "/" << _pre_avg);
+if(!isStream)peaks.resize(size);
 	// Streaming mode hack, when >0 onset detected
 
+if(_rawMode){
+	int lastPidx =-1 ;
+	for( int i =0 ; i < size;i++){
+		peaks[i]=0;
+		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
+			if((lastPidx>=0 && (i-lastPidx)>_combine*frameRate)  ||  lastPidx ==-1) {
+				peaks[i]=1;			
+			}
+			lastPidx = i;
+		}	
+	}
 	
+}
+else{
 	int nDetec=0;
 	Real peakTime = 0;
 	for( int i =0 ; i < size;i++){
-		if(_rawMode){peaks[i]=0;}
-		//cout << signal[i] <<"  " << maxs[i] <<"  " << avg[i] << endl;
+
+
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
+
 			peakTime = i/frameRate;
 			if((nDetec>0 && peakTime-peaks[nDetec-1]>_combine)  ||  nDetec ==0) {
-				if(_rawMode){
-				peaks[i]=1;
-				}
-				else{
-					peaks[nDetec]=peakTime;
-					
-					}
+				peaks[nDetec]=peakTime;
 				nDetec++;
+			
 			}
 		}
 		
 		
 	}
 
-	if(!_rawMode)peaks.resize(nDetec);
+peaks.resize(nDetec);
+
+	
+	}
 
 return;
  
