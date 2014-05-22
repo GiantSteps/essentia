@@ -84,6 +84,8 @@ peaks.resize(size);
 if(_rawMode){
 	int lastPidx =-1 ;
 	for( int i =0 ; i < size;i++){
+		E_DEBUG(EAlgorithm,"chkmax"<<maxs[i]);
+		E_DEBUG(EAlgorithm,"chkmax"<<avg[i]);
 		peaks[i]=0;
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
 			if((lastPidx>=0 && (i-lastPidx)>_combine*frameRate)  ||  lastPidx ==-1) {
