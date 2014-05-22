@@ -103,7 +103,7 @@ class SuperFluxPeaks : public Algorithm {
   SuperFluxPeaks(){
   
     _algo = standard::AlgorithmFactory::create("SuperFluxPeaks");
-    declareInput(_signal, 3,1,"novelty","the input bands spectrogram");
+    declareInput(_signal, 4,1,"novelty","the input bands spectrogram");
     declareOutput(_peaks,1,1,"peaks","SuperFlux");
   };
   
@@ -123,7 +123,9 @@ class SuperFluxPeaks : public Algorithm {
 void configure(const ParameterMap& params) {
     _algo->configure(params);
     this->setParameters(params);
-    _signal.setAcquireSize(_algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000);
+    int aqS = _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000;
+    EXEC_DEBUG("setAcquireSize" << aqS);
+    _signal.setAcquireSize(aqS);
     _signal.setReleaseSize(1);
     
   }
