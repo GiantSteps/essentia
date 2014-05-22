@@ -176,6 +176,7 @@ AlgorithmStatus SuperFluxPeaks::process() {
 else{
 	_algo->input("novelty").set(_signal.tokens());
 	_algo->output("peaks").set(_peaks.tokens());
+	_algo->compute();
 }
 	// give back the tokens that were reserved
 	releaseData();
