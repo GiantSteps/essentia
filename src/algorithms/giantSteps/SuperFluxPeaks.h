@@ -117,12 +117,14 @@ bool _rawmode;
 	declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30);
 	declareParameter("rawmode", "output mode: if true, returns array of same size as novelty function, with 1 where peaks stands, if false, output list of peaks instants", "{true,false}", true);
 
-  }
+  };
 
 
   // link algo parameter with streaming burffer options
 
-void configure(){}
+void configure(){
+EXEC_DEBUG("configuring Peaks");
+};
 
 void configure(const ParameterMap& params) {
 
@@ -135,7 +137,7 @@ void configure(const ParameterMap& params) {
     
     _rawmode = _algo->parameter("rawmode").toBool();
     
-  }
+  };
 
 
   AlgorithmStatus process();
