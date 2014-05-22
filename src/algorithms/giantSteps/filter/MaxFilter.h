@@ -69,7 +69,7 @@ class MaxFilter : public Algorithm {
 } // namespace essentia
 
 #include "streamingalgorithmwrapper.h"
-
+//#include "streamingalgorithmcomposite.h"
 
 namespace essentia {
 namespace streaming {
@@ -83,7 +83,7 @@ class MaxFilter : public StreamingAlgorithmWrapper {
 
  public:
   MaxFilter(){
-    declareAlgorithm("MaxFilter");
+    
     declareInput(_array,TOKEN, "signal");
     declareOutput(_filtered,TOKEN, "signal");
 
