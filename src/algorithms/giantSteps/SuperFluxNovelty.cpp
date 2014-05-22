@@ -64,11 +64,16 @@ void SuperFluxNovelty::compute() {
   if(!nBands){
   throw EssentiaException("SuperFluxNovelty : empty bands ");
   }
+  E_DEBUG( EAlgorithm, "got " << nFrames <<"frames, for frameWidth" << _frameWi << "with " << nBands<<" bands");
+  if(_frameWi>=nFrames){
+  
+  throw EssentiaException("SuperFluxNovelty : no enough frames comparing to frame witdh");
+  }
   
   
 // ONLINE MODE all results are advanced by frame width, allow easier streaming mode
 // For better accuracy
-cout<<nFrames <<"et " << _frameWi << "b  " << nBands<<endl;
+
 if (_online){diffs.resize(nFrames-_frameWi);	}
 else { diffs.resize(nFrames);}
 

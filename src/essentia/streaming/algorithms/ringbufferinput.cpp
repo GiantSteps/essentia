@@ -53,7 +53,7 @@ void RingBufferInput::configure()
 
 void RingBufferInput::add(Real* inputData, int size)
 {
-	//std::cerr << "adding " << size << " to ringbuffer with space " << _impl->_space << std::endl;
+	EXEC_DEBUG("adding " << size << " to ringbuffer with space " << _impl->_space);
 	int added = _impl->add(inputData,size);
 	if (added < size) throw EssentiaException("Not enough space in ringbuffer at input");
 }
@@ -66,7 +66,7 @@ AlgorithmStatus RingBufferInput::process() {
   AlgorithmStatus status = acquireData();
 
   if (status != OK) {
-    std::cout << "leaving the ringbufferinput while loop" << std::endl;
+    EXEC_DEBUG("leaving the ringbufferinput while loop");
     if (status == NO_OUTPUT) throw EssentiaException("internal error: output buffer full");
     return status;
   }
@@ -75,9 +75,9 @@ AlgorithmStatus RingBufferInput::process() {
   AudioSample* outputData = &(outputSignal[0]);
   int outputSize = outputSignal.size();
 
-  cout << "ringbufferinput getting" << outputSize << endl;
+  EXEC_DEBUG("ringbufferinput getting" << outputSize);
   int size = _impl->get(outputData, outputSize);
-  cout << "got " << size << " from ringbuffer with space " << _impl->_space << std::endl;
+  EXEC_DEBUG( "got " << size << " from ringbuffer with space " << _impl->_space );
 
   _output.setReleaseSize(size);
   releaseData();
