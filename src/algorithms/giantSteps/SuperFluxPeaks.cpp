@@ -155,14 +155,25 @@ AlgorithmStatus SuperFluxPeaks::process() {
 	  // cout << "peaks no fed" << endl;
 	  return status;
 	}
-// 	vector<Real> peaks;
+	
+	if(!_rawmode){
+	vector<Real> peaks;
 	_algo->input("novelty").set(_signal.tokens());
-	_algo->output("peaks").set(_peaks.tokens());
-// 	_peaks.setAquireSize()
-// 	_peaks.tokens()
+	_algo->output("peaks").set(peaks);
+
 	_algo->compute();
 	
-
+	_peaks.setAcquireSize(peaks.size());
+	_peaks.setReleaseSize(peaks.size());
+	for (int i = 0 ; i < peaks.size();i++){
+	_peaks.tokens()[i]=peaks[i];
+	}
+// 	fastcopy(&_peaks.tokens(),&peaks,peaks.size());
+}
+else{
+	_algo->input("novelty").set(_signal.tokens());
+	_algo->output("peaks").set(_peaks.tokens());
+}
 	// give back the tokens that were reserved
 	releaseData();
 

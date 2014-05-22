@@ -98,12 +98,13 @@ class SuperFluxPeaks : public Algorithm {
 
   standard::Algorithm * _algo;
 
+bool _rawmode;
 
  public:
   SuperFluxPeaks(){
   
     _algo = standard::AlgorithmFactory::create("SuperFluxPeaks");
-    declareInput(_signal, 4,1,"novelty","the input bands spectrogram");
+    declareInput(_signal, 17,1,"novelty","the input bands spectrogram");
     declareOutput(_peaks,1,1,"peaks","SuperFlux");
   };
   
@@ -122,12 +123,15 @@ class SuperFluxPeaks : public Algorithm {
   // link algo parameter with streaming burffer options
 
 void configure(const ParameterMap& params) {
+
     _algo->configure(params);
     this->setParameters(params);
     int aqS = _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000;
     EXEC_DEBUG("setAcquireSize" << aqS);
     _signal.setAcquireSize(aqS);
     _signal.setReleaseSize(1);
+    
+    _rawmode = _algo->parameter("rawmode").toBool();
     
   }
 
