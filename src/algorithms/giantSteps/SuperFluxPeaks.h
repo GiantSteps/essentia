@@ -122,6 +122,8 @@ bool _rawmode;
 
   // link algo parameter with streaming burffer options
 
+void configure(){}
+
 void configure(const ParameterMap& params) {
 
     _algo->configure(params);
