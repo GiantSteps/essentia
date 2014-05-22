@@ -239,7 +239,7 @@ void Network::init(){
 void Network::runStack(const bool endOfStream){
 
     // then run each algorithm as many times as needed for them to consume everything on their input
-    stack<int> runStack;
+    std::stack<int> runStack;
     runStack.push(1);
     while (!runStack.empty()) {
       int startIndex = runStack.top();
