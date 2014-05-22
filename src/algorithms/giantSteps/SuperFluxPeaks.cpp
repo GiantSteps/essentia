@@ -79,6 +79,7 @@ bool isStream = size <= max(_pre_avg,_pre_max )+1;
 E_DEBUG(EAlgorithm,"sfpeaks is Stream" << isStream << "size " << size <<"peaksS" << peaks.size());
 E_DEBUG(EAlgorithm,"maxSize" << maxs.size() <<"/" << _pre_max << "mov avgsize " << avg.size()<< "/" << _pre_avg);
 peaks.resize(size);
+E_DEBUG(EAlgorithm,"thresh"<<_threshold);
 	// Streaming mode hack, when >0 onset detected
 
 if(_rawMode){
@@ -91,7 +92,7 @@ if(_rawMode){
 			E_DEBUG(EAlgorithm,"peakDetected");
 			E_DEBUG(EAlgorithm,"chkmax"<<maxs[i]);
 		E_DEBUG(EAlgorithm,"chkavg"<<avg[i]);
-		E_DEBUG(EAlgorithm,"chkavg"<<_threshold);
+		
 				peaks[i]=1;	
 				lastPidx = i;
 			}
