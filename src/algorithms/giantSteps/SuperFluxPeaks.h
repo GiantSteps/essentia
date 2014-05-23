@@ -128,7 +128,7 @@ _algo->configure(this->_params);
 int aqS = _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000;
     EXEC_DEBUG("setAcquireSize" << aqS);
     _signal.setAcquireSize(aqS);
-    _signal.setReleaseSize(aqS);
+    _signal.setReleaseSize(1);
     _peaks.setAcquireSize(1);
     _peaks.setReleaseSize(1);
     _rawmode = _algo->parameter("rawmode").toBool();
