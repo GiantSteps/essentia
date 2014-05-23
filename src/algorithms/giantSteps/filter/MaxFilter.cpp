@@ -19,7 +19,7 @@
 
 #include "MaxFilter.h"
 #include "essentiamath.h"
-//#define HERKGIL
+#define HERKGIL
 //TODO:Validate HERKGIL
 using namespace std;
 
@@ -110,7 +110,9 @@ void MaxFilter::compute() {
 
 
 		//TODO : check relevance and may be go toward a less naive algorithm (Herk Gil?)
-	
+	for (int j=0;j<_width;j++){
+	filtered[j]=0;
+	}
 for(int j = _width ; j<size ; j++){
 
 
