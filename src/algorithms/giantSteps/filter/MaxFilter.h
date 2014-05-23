@@ -68,7 +68,7 @@ class MaxFilter : public Algorithm {
 } // namespace standard
 } // namespace essentia
 
-#include "streamingalgorithmwrapper.h"
+#include "streamingalgorithm.h"
 //#include "streamingalgorithmcomposite.h"
 
 namespace essentia {

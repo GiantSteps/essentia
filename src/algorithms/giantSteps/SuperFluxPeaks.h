@@ -31,8 +31,8 @@ class SuperFluxPeaks : public Algorithm {
  	Input<std::vector<Real> > _signal;
  	Output<std::vector<Real> > _peaks;
  
-	Algorithm* _movAvg;
-	Algorithm* _maxf;
+	standard::Algorithm* _movAvg;
+	standard::Algorithm* _maxf;
   
  	int _pre_avg;
 	int _pre_max;
