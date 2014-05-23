@@ -19,7 +19,7 @@
 
 #include "MaxFilter.h"
 #include "essentiamath.h"
-#define HERKGIL
+//#define HERKGIL
 //TODO:Validate HERKGIL
 using namespace std;
 
