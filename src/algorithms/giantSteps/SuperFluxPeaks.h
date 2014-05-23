@@ -67,7 +67,7 @@ class SuperFluxPeaks : public Algorithm {
     declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100);
 	declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30);
 	declareParameter("rawmode", "output mode: if true, returns array of same size as novelty function, with 1 where peaks stands, if false, output list of peaks instants", "{true,false}", false);
-
+	// declareParameter("rawmode", "output starts at firstframe", "{true,false}", false);
 
 }
 

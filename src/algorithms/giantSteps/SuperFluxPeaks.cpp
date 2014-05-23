@@ -75,12 +75,11 @@ void SuperFluxPeaks::compute() {
 	_maxf->compute();
 
 
-bool isStream = size <= max(_pre_avg,_pre_max )+1;
+// bool isStream = size <= max(_pre_avg,_pre_max )+1;
 E_DEBUG(EAlgorithm,"sfpeaks is Stream" << isStream << "size " << size <<"peaksS" << peaks.size());
 E_DEBUG(EAlgorithm,"maxSize" << maxs.size() <<"/" << _pre_max << "mov avgsize " << avg.size()<< "/" << _pre_avg);
 peaks.resize(size);
 E_DEBUG(EAlgorithm,"thresh"<<_threshold);
-	// Streaming mode hack, when >0 onset detected
 
 if(_rawMode){
 	int lastPidx =-1 ;
