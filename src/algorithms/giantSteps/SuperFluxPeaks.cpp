@@ -43,6 +43,7 @@ void SuperFluxPeaks::configure() {
 	_threshold = parameter("threshold").toReal();
 	
 	_rawMode = parameter("rawmode").toBool();
+	_startZero = parameter("startFromZero").toBool();
 
 	_movAvg->configure("size",_pre_avg+1);
 	_maxf->configure("width",_pre_max+1);
@@ -83,18 +84,23 @@ peaks.resize(size);
 
 if(_rawMode){
 	int lastPidx =-1 ;
-	for( int i =0 ; i < size;i++){
-
-		peaks[i]=0;
+	int zeroStep;
+	if(_startZero){
+	zeroStep = 0;}
+	else{
+	zeroStep = max(_pre_avg,_pre_max);
+	for (int i=size-zeroStep; i < size ;i++){
+	peaks[i]=0;
+	}
+	}
+	for( int i =zeroStep ; i < size;i++){
+		peaks[i-zeroStep]=0;
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
 			if((lastPidx>=0 && (i-lastPidx)>_combine*frameRate)  ||  lastPidx ==-1) {
-// 			E_DEBUG(EAlgorithm,"peakDetected");
-			
-		
-				peaks[i]=1;	
+// 				E_DEBUG(EAlgorithm,"peakDetected");
+				peaks[i-zeroStep]=1;	
 				lastPidx = i;
-			}
-			
+			}	
 		}	
 	}
 	

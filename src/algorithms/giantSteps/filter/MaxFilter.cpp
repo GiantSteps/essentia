@@ -64,7 +64,10 @@ int kl=(_width-1)/2;
 vector<Real> cs(_width-2);
 vector<Real> ds(_width-2);
 
-
+// fill unknown with 0
+for (int i = 0 ; i < kl ; i++){
+filtered[i]=0;
+}
 
 for(int u = kl ; u<size ; u+=_width-1){
 		ds[0]=array[u];
@@ -79,7 +82,8 @@ for(int u = kl ; u<size ; u+=_width-1){
 		}
 		
 		for (int i = 0 ; i <= _width-2 ; i++){
-			filtered[u-kl+i] = max(cs[i],ds[i]);
+			// filtered[u-kl+i] = max(cs[i],ds[i]);
+			filtered[u+i] = max(cs[i],ds[i]);
 		}
 		
 	
@@ -139,11 +143,6 @@ void MaxFilter::reset() {
 }
 
 
-// TODO in the case of lower accuracy in evaluation
-// implement post-processing steps for methods in OnsetDetection, which required it
-// wrapping the OnsetDetection algo
-// - smoothing?
-// - etc., whatever was requiered in original matlab implementations
 
 } // namespace standard
 } // namespace essentia
