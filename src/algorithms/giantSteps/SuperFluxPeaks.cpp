@@ -162,20 +162,20 @@ AlgorithmStatus SuperFluxPeaks::process() {
 	  return status;
 	}
 	
-	if(!_rawmode){
-	vector<Real> peaks;
-	_algo->input("novelty").set(_signal.tokens());
-	_algo->output("peaks").set(peaks);
-
-	_algo->compute();
-	
-	_peaks.setAcquireSize(peaks.size());
-	_peaks.setReleaseSize(peaks.size());
-	for (int i = 0 ; i < peaks.size();i++){
-	_peaks.tokens()[i]=peaks[i];
-	}
-// 	fastcopy(&_peaks.tokens(),&peaks,peaks.size());
-}
+// 	if(!_rawmode){
+// 	vector<Real> peaks;
+// 	_algo->input("novelty").set(_signal.tokens());
+// 	_algo->output("peaks").set(peaks);
+// 
+// 	_algo->compute();
+// 	
+// 	_peaks.setAcquireSize(peaks.size());
+// 	_peaks.setReleaseSize(peaks.size());
+// 	for (int i = 0 ; i < peaks.size();i++){
+// 	_peaks.tokens()[i]=peaks[i];
+// 	}
+// // 	fastcopy(&_peaks.tokens(),&peaks,peaks.size());
+// }
 else{
 	_algo->input("novelty").set(_signal.tokens());
 	_algo->output("peaks").set(_peaks.tokens());
