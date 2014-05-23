@@ -89,7 +89,7 @@ Real cur_diff;
 
 for (int i = _frameWi ; i< nFrames;i++){
 
-	diffs[i]=0;
+	diffs[i-onlinestep]=0;
 	//vector<Real> tmpBuffer(bands[i-_frameWi].begin(),bands[i-_frameWi].end());
 	_maxf->input("signal").set(bands[i-_frameWi]);
 	_maxf->output("signal").set(maxsBuffer);
