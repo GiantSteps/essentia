@@ -130,7 +130,7 @@ int aqS = _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg
     _signal.setAcquireSize(aqS);
     _signal.setReleaseSize(aqS);
     _peaks.setAcquireSize(aqS);
-    _peaks.setReleaseSize(aqS);
+    _peaks.setReleaseSize(1);
     _rawmode = _algo->parameter("rawmode").toBool();
 };
 
