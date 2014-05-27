@@ -58,7 +58,7 @@ class SuperFluxNovelty : public Algorithm{
   void declareParameters() {
     declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "[3,inf)", 3);
 	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 2);
-	declareParameter("Online", "realign output with audio by frameWidth : if using streaming mode set it to true, else for static precision measurement, use false", "{false,true}", false);
+	declareParameter("Online", "realign output with audio by frameWidth ; if using streaming mode : set it to true, else for static precision measurement: use false", "{false,true}", false);
 }
 
   void reset();
