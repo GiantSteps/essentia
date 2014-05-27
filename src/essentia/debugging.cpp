@@ -138,8 +138,8 @@ void Logger::info(const string& msg) {
 
 void Logger::warning(const string& msg) {
   if (!warningLevelActive) return;
-  static const string YELLOW_FONT = "\x1B[0;33m";
-  static const string RESET_FONT = "\x1B[0m";
+  static const string YELLOW_FONT = "";//"\x1B[0;33m";
+  static const string RESET_FONT = "";//"\x1B[0m";
   _msgQueue.push_back(E_STRINGIFY(YELLOW_FONT << "[ WARNING  ] " << RESET_FONT << msg << '\n'));
   flush();
 }
