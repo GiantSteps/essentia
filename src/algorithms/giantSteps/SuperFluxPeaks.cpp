@@ -46,7 +46,7 @@ void SuperFluxPeaks::configure() {
 	_startZero = parameter("startFromZero").toBool();
 
 	_movAvg->configure("size",_pre_avg);
-	_maxf->configure("width",_pre_max);
+	_maxf->configure("width",_pre_max,"Causal",true);
 
 
 }

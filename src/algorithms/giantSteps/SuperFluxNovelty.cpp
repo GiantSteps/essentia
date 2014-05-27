@@ -37,7 +37,7 @@ void SuperFluxNovelty::configure() {
  	//width has to be odd, then local binW represent half the width
     _binW = parameter("binWidth").toInt();
     if(_binW%2==0)_binW++;
-    _maxf->configure("width",_binW);
+    _maxf->configure("width",_binW,"Causal",false);
     
     
 	_binW= int((_binW-1)/2); 
