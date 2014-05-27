@@ -79,19 +79,19 @@ void SuperFluxPeaks::compute() {
 // bool isStream = size <= max(_pre_avg,_pre_max )+1;
 E_DEBUG(EAlgorithm,"sfpeaks size " << size <<"peaksS" << peaks.size());
 E_DEBUG(EAlgorithm,"maxSize" << maxs.size() <<"/" << _pre_max << "mov avgsize " << avg.size()<< "/" << _pre_avg);
-peaks.resize(size);
+
 
 
 if(_rawMode){
 	int lastPidx =-1 ;
 	int zeroStep;
 	if(_startZero){
-	zeroStep = 0;}
+	zeroStep = 0;
+	if(peaks.size()!=size)peaks.resize(size);
+	}
 	else{
 	zeroStep = max(_pre_avg,_pre_max)+1;
-	for (int i=size-zeroStep; i < size ;i++){
-	peaks[i]=0;
-	}
+	if(peaks.size()!=size-zeroStep)peaks.resize(size-zeroStep);
 	}
 	for( int i =zeroStep ; i < size;i++){
 		peaks[i-zeroStep]=0;
@@ -106,6 +106,7 @@ if(_rawMode){
 	
 }
 else{
+	if(peaks.size()!=size)peaks.resize(size);
 	int nDetec=0;
 	Real peakTime = 0;
 	for( int i =0 ; i < size;i++){
