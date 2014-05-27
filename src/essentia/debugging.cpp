@@ -130,8 +130,8 @@ void Logger::debug(DebuggingModule module, const string& msg, bool resetHeader) 
 
 void Logger::info(const string& msg) {
   if (!infoLevelActive) return;
-  static const string GREEN_FONT = "\x1B[0;32m";
-  static const string RESET_FONT = "\x1B[0m";
+  static const string GREEN_FONT = "";//"\x1B[0;32m";
+  static const string RESET_FONT = "";//"\x1B[0m";
   _msgQueue.push_back(E_STRINGIFY(GREEN_FONT << "[   INFO   ] " << RESET_FONT << msg << '\n'));
   flush();
 }
