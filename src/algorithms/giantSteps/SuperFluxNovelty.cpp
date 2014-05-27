@@ -38,9 +38,7 @@ void SuperFluxNovelty::configure() {
     _binW = parameter("binWidth").toInt();
     if(_binW%2==0)_binW++;
     _maxf->configure("width",_binW,"Causal",false);
-    
-    
-	_binW= int((_binW-1)/2); 
+
     
 	_frameWi = parameter("frameWidth").toInt();
 
@@ -103,8 +101,7 @@ for (int i = _frameWi ; i< nFrames;i++){
 		diffs[i-onlinestep] +=cur_diff ; }
 		
 	}
-	
-	//diffs[i]/=(nBands-2.*_binW);
+
 }
 return;
 }
