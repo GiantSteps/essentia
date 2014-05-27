@@ -88,7 +88,7 @@ if(_rawMode){
 	if(_startZero){
 	zeroStep = 0;}
 	else{
-	zeroStep = max(_pre_avg,_pre_max);
+	zeroStep = max(_pre_avg,_pre_max)+1;
 	for (int i=size-zeroStep; i < size ;i++){
 	peaks[i]=0;
 	}
