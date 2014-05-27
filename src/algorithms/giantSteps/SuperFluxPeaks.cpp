@@ -90,7 +90,7 @@ if(_rawMode){
 	if(peaks.size()!=size)peaks.resize(size);
 	}
 	else{
-	zeroStep = max(_pre_avg,_pre_max)+1;
+	zeroStep = max(_pre_avg,_pre_max);
 	if(peaks.size()!=size-zeroStep)peaks.resize(size-zeroStep);
 	}
 	for( int i =zeroStep ; i < size;i++){
