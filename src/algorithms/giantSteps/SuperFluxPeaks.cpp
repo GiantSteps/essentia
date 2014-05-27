@@ -83,7 +83,7 @@ E_DEBUG(EAlgorithm,"maxSize" << maxs.size() <<"/" << _pre_max << "mov avgsize " 
 
 
 if(_rawMode){
-	int lastPidx =-1 ;
+	
 	int zeroStep;
 	if(_startZero){
 	zeroStep = 0;
@@ -95,11 +95,12 @@ if(_rawMode){
 	}
 	for( int i =zeroStep ; i < size;i++){
 		peaks[i-zeroStep]=0;
+		if(lastPidx>=0)lastPidx++;
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
-			if((lastPidx>=0 && (i-lastPidx)>_combine*frameRate)  ||  lastPidx ==-1) {
+			if((lastPidx>=0 && lastPidx>_combine*frameRate)  ||  lastPidx <0) {
 // 				E_DEBUG(EAlgorithm,"peakDetected");
 				peaks[i-zeroStep]=1;	
-				lastPidx = i;
+				lastPidx = 0;
 			}	
 		}	
 	}
@@ -110,8 +111,6 @@ else{
 	int nDetec=0;
 	Real peakTime = 0;
 	for( int i =0 ; i < size;i++){
-
-
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
 
 			peakTime = i/frameRate;

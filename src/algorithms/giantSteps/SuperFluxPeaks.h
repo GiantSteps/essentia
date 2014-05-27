@@ -46,7 +46,7 @@ class SuperFluxPeaks : public Algorithm {
 	bool _rawMode;
 	bool _startZero;
 
-
+int lastPidx =-1 ;
 
  public:
   SuperFluxPeaks() {
