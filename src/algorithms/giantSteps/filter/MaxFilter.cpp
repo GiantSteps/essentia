@@ -102,7 +102,9 @@ void MaxFilter::compute() {
 
 
   	int size= array.size();
-
+	
+	if(_width>=size)throw EssentiaException("recieved signal is smaller or equal than width");
+	
 	filtered.resize(size);
 	Real maxs = 0;
 	

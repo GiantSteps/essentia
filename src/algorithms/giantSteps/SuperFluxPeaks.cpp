@@ -45,8 +45,8 @@ void SuperFluxPeaks::configure() {
 	_rawMode = parameter("rawmode").toBool();
 	_startZero = parameter("startFromZero").toBool();
 
-	_movAvg->configure("size",_pre_avg+1);
-	_maxf->configure("width",_pre_max+1);
+	_movAvg->configure("size",_pre_avg);
+	_maxf->configure("width",_pre_max);
 
 
 }
@@ -106,7 +106,7 @@ if(_rawMode){
 	
 }
 else{
-	if(peaks.size()!=size)peaks.resize(size);
+	peaks.reserve(size);
 	int nDetec=0;
 	Real peakTime = 0;
 	for( int i =0 ; i < size;i++){
