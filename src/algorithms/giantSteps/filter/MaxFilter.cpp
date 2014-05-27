@@ -123,7 +123,7 @@ void MaxFilter::compute() {
 	filtered[i]=max(maxs,array[i]);
 	}
 	int lastj = _causal?size:size-_width;
-	for(int j = _width ; j<size ; j++){
+	for(int j = _width ; j<lastj ; j++){
 
 
 		// if the outgoing term is not last max the new max is faster to compute 
