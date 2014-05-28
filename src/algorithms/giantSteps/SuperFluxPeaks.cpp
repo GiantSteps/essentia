@@ -40,7 +40,7 @@ void SuperFluxPeaks::configure() {
 	// convert to seconds
 	_combine = parameter("combine").toReal()/1000.;
 
-	_threshold = parameter("threshold").toReal();
+// 	_threshold = parameter("threshold").toReal();
 	
 	_rawMode = parameter("rawmode").toBool();
 	_startZero = parameter("startFromZero").toBool();
@@ -53,6 +53,8 @@ void SuperFluxPeaks::configure() {
 
 
 void SuperFluxPeaks::compute() {
+// RT parameters
+Real _threshold = parameter("threshold").toReal();
   	const vector<Real>& signal = _signal.get();
 	vector<Real>& peaks = _peaks.get();
   	if (signal.empty()) {

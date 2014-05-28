@@ -37,7 +37,7 @@ class SuperFluxPeaks : public Algorithm {
  	int _pre_avg;
 	int _pre_max;
 	Real _combine;
-	Real _threshold;
+// 	Real _threshold;
 
 
   	int hopSize;
