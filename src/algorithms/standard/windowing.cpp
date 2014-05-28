@@ -58,7 +58,7 @@ void Windowing::createWindow(const std::string& windowtype) {
   else if (windowtype == "blackmanharris74") blackmanHarris74();
   else if (windowtype == "blackmanharris92") blackmanHarris92();
 
- if(_Normalize) normalize();
+ if(_Normalize){ normalize();}
 }
 
 void Windowing::compute() {
@@ -188,6 +188,7 @@ void Windowing::blackmanHarris92() {
 
 
 void Windowing::normalize() {
+cout << "fdsgsjflfdksjfdslfkjdfslkj" << _Normalize <<endl;
   const int size = _window.size();
   Real sum = 0.0;
   for (int i=0; i<size; i++) {
