@@ -36,7 +36,7 @@
  * little bit, but not that much really.
  */
 #ifndef DEBUGGING_ENABLED
-#define DEBUGGING_ENABLED 0
+#define DEBUGGING_ENABLED 1
 #endif
 
 
