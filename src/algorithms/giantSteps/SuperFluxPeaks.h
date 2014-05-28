@@ -61,7 +61,7 @@ int lastPidx =-1 ;
 
 
   void declareParameters() {
-	declareParameter("frameRate", "frameRate", "(0,inf)", 172);
+	declareParameter("frameRate", "frameRate", "(0,inf)", 172.);
     declareParameter("threshold", "threshold for peak-picking", "(0,inf)", 1.25);
 	declareParameter("combine", "ms for onset combination", "(0,inf)", 30);
     declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100);
