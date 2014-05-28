@@ -56,7 +56,7 @@ void SuperFluxPeaks::compute() {
 // RT parameters
 
 Real _threshold = parameter("threshold").toReal();
-cout<< _threshold << ":" << this << endl;
+// cout<< _threshold << ":" << this << endl;
 
 
   	const vector<Real>& signal = _signal.get();
