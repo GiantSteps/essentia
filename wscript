@@ -24,6 +24,10 @@ def options(ctx):
                    dest='MODE', default="release",
                    help='debug or release')
 
+    ctx.add_option('--arch', action='store',
+                   dest='ARCH', default="x64",
+                   help='i386, x64 or FAT')
+
 
 
 def configure(ctx):
@@ -70,6 +74,16 @@ def configure(ctx):
         # add /usr/local/include as the brew formula for yaml doesn't have
         # the cflags properly set
         ctx.env.CXXFLAGS += [ '-I/usr/local/include' ]
+
+        if ctx.options.ARCH == 'i386':
+            ctx.env.CXXFLAGS += [ '-arch' , 'i386']
+            ctx.env.LINKFLAGS += [ '-arch', 'i386']
+            ctx.env.LDFLAGS = ['-arch', 'i386']
+        if ctx.options.ARCH == 'FAT':
+            ctx.env.CXXFLAGS += [ '-arch' , 'i386', '-arch', 'x86_64']
+            ctx.env.LINKFLAGS += [ '-arch' , 'i386', '-arch', 'x86_64']
+            ctx.env.LDFLAGS = [ '-arch' , 'i386', '-arch', 'x86_64']
+            
 
     ctx.load('compiler_cxx compiler_c')
 
