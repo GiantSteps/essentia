@@ -84,6 +84,19 @@ def configure(ctx):
             ctx.env.LINKFLAGS += [ '-arch' , 'i386', '-arch', 'x86_64']
             ctx.env.LDFLAGS = [ '-arch' , 'i386', '-arch', 'x86_64']
             
+    elif sys.platform == 'win32': 
+        # compile libgcc and libstd statically when using MinGW
+        ctx.env.CXXFLAGS = [ '-static-libgcc', '-static-libstdc++' ]
+        
+        # make pkgconfig find 3rdparty libraries in packaging/win32_3rdparty
+        libs_3rdparty = ['yaml-0.1.5', 'fftw-3.3.3', 'libav-0.8.9', 'libsamplerate-0.1.8']
+        libs_paths = [';packaging\win32_3rdparty\\' + lib + '\lib\pkgconfig' for lib in libs_3rdparty]
+        os.environ["PKG_CONFIG_PATH"] = ';'.join(libs_paths)
+        
+        # TODO why this code does not work?
+        # force the use of mingw gcc compiler instead of msvc
+        #ctx.env.CC = 'gcc'
+        #ctx.env.CXX = 'g++'
 
     ctx.load('compiler_cxx compiler_c')
 
