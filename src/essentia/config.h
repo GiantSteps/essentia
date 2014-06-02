@@ -36,7 +36,7 @@
  * little bit, but not that much really.
  */
 #ifndef DEBUGGING_ENABLED
-#define DEBUGGING_ENABLED 1
+#define DEBUGGING_ENABLED 0
 #endif
 
 
@@ -90,7 +90,12 @@
 #define ALLOW_DEFAULT_PARAMETERS 1
 #endif
 
-
+/**
+ * C++ version
+ */
+#if __cplusplus >= 201103L
+#  define CPP_11
+#endif
 
 /**
  * OS type.

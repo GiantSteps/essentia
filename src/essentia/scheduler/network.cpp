@@ -239,7 +239,7 @@ void Network::init(){
 void Network::runStack(const bool endOfStream){
 
     // then run each algorithm as many times as needed for them to consume everything on their input
-    stack<int> runStack;
+    std::stack<int> runStack;
     runStack.push(1);
     while (!runStack.empty()) {
       int startIndex = runStack.top();
@@ -263,10 +263,11 @@ void Network::runStack(const bool endOfStream){
           // NOTE: be careful with endOfStream, it should not be propagated
           // as long as we have at least 1 index value on the stack
           if (status == NO_OUTPUT) {
-            runStack.push(i);
-            E_DEBUG(EScheduler, "Rescheduling algorithm " << _toposortedNetwork[i]->name() <<
+        E_DEBUG(EScheduler, "Rescheduling algorithm " << _toposortedNetwork[i]->name() <<
                    // " on generator frame " << gen->nProcess <<
                     " to run later, output buffers temporarily full");
+            runStack.push(i);
+
             /*
             E_WARNING("Rescheduling algorithm " << _toposortedNetwork[i]->name() <<
                       " on generator frame " << gen->nProcess <<

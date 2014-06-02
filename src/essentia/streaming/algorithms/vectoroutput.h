@@ -64,6 +64,7 @@ class VectorOutput : public Algorithm {
 
     EXEC_DEBUG("acquiring " << ntokens << " tokens");
     if (!_data.acquire(ntokens)) {
+    EXEC_DEBUG("No Input");
       return NO_INPUT;
     }
 

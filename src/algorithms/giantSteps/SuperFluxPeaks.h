@@ -31,22 +31,22 @@ class SuperFluxPeaks : public Algorithm {
  	Input<std::vector<Real> > _signal;
  	Output<std::vector<Real> > _peaks;
  
-	Algorithm* _movAvg;
-	Algorithm* _maxf;
+	standard::Algorithm* _movAvg;
+	standard::Algorithm* _maxf;
   
  	int _pre_avg;
 	int _pre_max;
 	Real _combine;
-	Real _threshold;
+// 	Real _threshold;
 
 
   	int hopSize;
   	Real frameRate;
 
 	bool _rawMode;
+	bool _startZero;
 
-
-
+int lastPidx =-1 ;
 
  public:
   SuperFluxPeaks() {
@@ -61,13 +61,13 @@ class SuperFluxPeaks : public Algorithm {
 
 
   void declareParameters() {
-	declareParameter("frameRate", "frameRate", "(0,inf)", 172);
+	declareParameter("frameRate", "frameRate", "(0,inf)", 172.);
     declareParameter("threshold", "threshold for peak-picking", "(0,inf)", 1.25);
 	declareParameter("combine", "ms for onset combination", "(0,inf)", 30);
     declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100);
 	declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30);
 	declareParameter("rawmode", "output mode: if true, returns array of same size as novelty function, with 1 where peaks stands, if false, output list of peaks instants", "{true,false}", false);
-
+	declareParameter("startFromZero", "in rawmode, output starts at 0 if not starts at frame corresponding max(pre_avg,pre_max)", "{true,false}", true);
 
 }
 
@@ -98,35 +98,52 @@ class SuperFluxPeaks : public Algorithm {
 
   standard::Algorithm * _algo;
 
+bool _rawmode;
 
  public:
   SuperFluxPeaks(){
   
     _algo = standard::AlgorithmFactory::create("SuperFluxPeaks");
-    declareInput(_signal, 3,1,"novelty","the input bands spectrogram");
+    declareInput(_signal, 17,1,"novelty","the input bands spectrogram");
     declareOutput(_peaks,1,1,"peaks","SuperFlux");
   };
   
 
   void declareParameters() {
-	declareParameter("frameRate", "frameRate", "(0,inf)", 172);
+	declareParameter("frameRate", "frameRate", "(0,inf)", 172.);
     declareParameter("threshold", "threshold for peak-picking", "(0,inf)", 1.25);
 	declareParameter("combine", "ms for onset combination", "(0,inf)", 30);
     declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100);
 	declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30);
 	declareParameter("rawmode", "output mode: if true, returns array of same size as novelty function, with 1 where peaks stands, if false, output list of peaks instants", "{true,false}", true);
+	declareParameter("startFromZero", "output starts at 0 if not starts at frame corresponding max(pre_avg,pre_max)", "{true,false}", false);
+  };
 
-  }
 
-  void configure() {}
+  // link algo parameter with streaming burffer options
 
-void configure(const ParameterMap& params) {
-    _algo->configure(params);
-    this->setParameters(params);
-    _signal.setAcquireSize(_algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000);
+void configure(){
+EXEC_DEBUG("configuring Peaks");
+_algo->configure(this->_params);
+int aqS = 1+ _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000;
+    EXEC_DEBUG("setAcquireSize" << aqS);
+    _signal.setAcquireSize(aqS);
     _signal.setReleaseSize(1);
     
-  }
+    
+    if(_algo->parameter("rawmode").toBool() && !_algo->parameter("startFromZero").toBool()){
+    _peaks.setAcquireSize(1);
+    _peaks.setReleaseSize(1);
+    }
+    else{
+    _peaks.setAcquireSize(aqS);
+    _peaks.setReleaseSize(aqS);
+    }
+
+
+};
+
+
 
 
   AlgorithmStatus process();

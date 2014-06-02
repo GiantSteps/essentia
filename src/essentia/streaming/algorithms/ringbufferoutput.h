@@ -16,37 +16,31 @@
  * You should have received a copy of the Affero GNU General Public License
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
- 
- // GiantStep Hack
- // ringbuffer added to essentia/streaming/algo, this one does not compile for the moment
 
-#ifndef ESSENTIA_STREAMING_RINGBUFFERINPUT_H
-#define ESSENTIA_STREAMING_RINGBUFFERINPUT_H
+#ifndef ESSENTIA_STREAMING_RINGBUFFEROUTPUT_H
+#define ESSENTIA_STREAMING_RINGBUFFEROUTPUT_H
 
-#include "streamingalgorithm.h"
-using namespace std;
+#include "../streamingalgorithm.h"
+
 namespace essentia {
 namespace streaming {
 
-class RingBufferInput : public Algorithm {
+class RingBufferOutput : public Algorithm {
  protected:
-  Source<Real> _output;
+  Sink<Real> _input;
   class RingBufferImpl* _impl;
 
  public:
-  RingBufferInput();
-  ~RingBufferInput();
+  RingBufferOutput();
+  ~RingBufferOutput();
 
-  void add(Real* inputData, int size);
+  int get(Real* outputData, int max);
 
   AlgorithmStatus process();
 
-  void shouldStop(bool stop) {
-    E_DEBUG(EExecution, "RBI should stop...");
-  }
-
   void declareParameters() {
     declareParameter("bufferSize", "the size of the ringbuffer", "", 8192);
+    declareParameter("blockSize", "the size of the release block", "", 1024);
   }
 
   void configure();
@@ -60,4 +54,4 @@ class RingBufferInput : public Algorithm {
 } // namespace streaming
 } // namespace essentia
 
-#endif // ESSENTIA_STREAMING_RINGBUFFERINPUT_H
+#endif // ESSENTIA_STREAMING_RINGBUFFEROUTPUT_H

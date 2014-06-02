@@ -16,48 +16,46 @@
  * You should have received a copy of the Affero GNU General Public License
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
- 
- // GiantStep Hack
- // ringbuffer added to essentia/streaming/algo, this one does not compile for the moment
 
-#ifndef ESSENTIA_STREAMING_RINGBUFFERINPUT_H
-#define ESSENTIA_STREAMING_RINGBUFFERINPUT_H
+#include "RingBufferRt.h"
 
-#include "streamingalgorithm.h"
+#include "sourcebase.h"
+#include "atomic.h"
+
 using namespace std;
+
 namespace essentia {
 namespace streaming {
 
-class RingBufferInput : public Algorithm {
- protected:
-  Source<Real> _output;
-  class RingBufferImpl* _impl;
+const char* RingBufferRt::name = "RingBufferRt";
+const char* RingBufferRt::description = DOC(
+"This algorithm gets data from an input ringbuffer of type Real that is fed into the essentia streaming mode."
+);
 
- public:
-  RingBufferInput();
-  ~RingBufferInput();
+RingBufferRt::RingBufferRt():_impl(0)
+{
+  declareOutput(_output, 1024, "signal", "data source of what's coming from the ringbuffer");
+  _output.setBufferType(BufferUsage::forAudioStream);
+}
 
-  void add(Real* inputData, int size);
+RingBufferRt::~RingBufferRt()
+{
+	delete _impl;
+}
 
-  AlgorithmStatus process();
+void RingBufferRt::configure()
+{
+	delete _impl;
+	_impl = new RingBufferImpl(RingBufferImpl::kAvailable,parameter("bufferSize").toInt());
+}
 
-  void shouldStop(bool stop) {
-    E_DEBUG(EExecution, "RBI should stop...");
-  }
 
-  void declareParameters() {
-    declareParameter("bufferSize", "the size of the ringbuffer", "", 8192);
-  }
 
-  void configure();
-  void reset();
 
-  static const char* name;
-  static const char* description;
-
-};
+void RingBufferRt::reset() {
+  Algorithm::reset();
+  _impl->reset();
+}
 
 } // namespace streaming
 } // namespace essentia
-
-#endif // ESSENTIA_STREAMING_RINGBUFFERINPUT_H

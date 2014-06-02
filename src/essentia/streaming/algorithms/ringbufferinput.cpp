@@ -22,7 +22,7 @@
 #include "sourcebase.h"
 #include "atomic.h"
 
-using namespace std;
+
 
 namespace essentia {
 namespace streaming {
@@ -34,7 +34,7 @@ const char* RingBufferInput::description = DOC(
 
 RingBufferInput::RingBufferInput():_impl(0)
 {
-  declareOutput(_output, 1024, "signal", "data source of what's coming from the ringbuffer");
+  declareOutput(_output, 4096, "signal", "data source of what's coming from the ringbuffer");
   _output.setBufferType(BufferUsage::forAudioStream);
 }
 
@@ -47,11 +47,13 @@ void RingBufferInput::configure()
 {
 	delete _impl;
 	_impl = new RingBufferImpl(RingBufferImpl::kAvailable,parameter("bufferSize").toInt());
+	
+	_output.setAcquireSize(parameter("blockSize").toInt());
 }
 
 void RingBufferInput::add(Real* inputData, int size)
 {
-	//std::cerr << "adding " << size << " to ringbuffer with space " << _impl->_space << std::endl;
+	EXEC_DEBUG("adding " << size << " to ringbuffer with space " << _impl->_space);
 	int added = _impl->add(inputData,size);
 	if (added < size) throw EssentiaException("Not enough space in ringbuffer at input");
 }
@@ -64,7 +66,7 @@ AlgorithmStatus RingBufferInput::process() {
   AlgorithmStatus status = acquireData();
 
   if (status != OK) {
-    //std::cerr << "leaving the ringbufferinput while loop" << std::endl;
+    EXEC_DEBUG("leaving the ringbufferinput while loop");
     if (status == NO_OUTPUT) throw EssentiaException("internal error: output buffer full");
     return status;
   }
@@ -73,9 +75,9 @@ AlgorithmStatus RingBufferInput::process() {
   AudioSample* outputData = &(outputSignal[0]);
   int outputSize = outputSignal.size();
 
-  std::cout << "mainringbufferinput getting" << outputSize << endl;
+  EXEC_DEBUG("ringbufferinput getting" << outputSize);
   int size = _impl->get(outputData, outputSize);
-  std::cout << "got " << size << " from ringbuffer with space " << _impl->_space << std::endl;
+  EXEC_DEBUG( "got " << size << " from ringbuffer with space " << _impl->_space );
 
   _output.setReleaseSize(size);
   releaseData();

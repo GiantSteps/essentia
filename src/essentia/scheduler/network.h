@@ -113,7 +113,7 @@ class Network {
 
 
 void init();
-void runStack(const bool endOfStream=true);
+void runStack(const bool endOfStream=false);
   void run();
 
   /**
