@@ -71,7 +71,7 @@ Real _threshold = parameter("threshold").toReal();
 
 
 	vector<Real> avg(size);
-
+	_movAvg->reset();
 	_movAvg->input("signal").set(signal);
 	_movAvg->output("signal").set(avg);
 	_movAvg->compute();
