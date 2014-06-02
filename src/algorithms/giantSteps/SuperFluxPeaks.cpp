@@ -110,7 +110,7 @@ if(_rawMode){
 	}
 	else{
 	zeroStep = max(_pre_avg,_pre_max)-1;
-	//if(peaks.size()!=size-zeroStep)peaks.resize(size-zeroStep);
+	if(peaks.size()!=size-zeroStep)peaks.resize(size-zeroStep);
 	}
 	for( int i =zeroStep ; i < size;i++){
 		peaks[i-zeroStep]=0;
