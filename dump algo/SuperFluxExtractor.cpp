@@ -18,111 +18,33 @@
  */
 
 #include "SuperFluxExtractor.h"
-#include "essentiamath.h"
 
-using namespace std;
+
+
 
 namespace essentia {
-namespace standard {
+namespace streaming {
 
 
 const char* SuperFluxExtractor::name = "SuperFluxExtractor";
-const char* SuperFluxExtractor::description = DOC("Superflux algorithm : Maximum filter and differentiation for onset detection robust again vibrato"
-"Input : frames of audio");
+const char* SuperFluxExtractor::description = DOC("Superflux algorithm : Use of superFluxNovelty and superFluxPeaks for extracting onsets with set of parameters advised by [1] \n"
+"[1] : \"Maximum Filter Vibrato Suppression for Onset Detection\" by Sebastian Böck and Gerhard Widmer in Proceedings of the 16th International Conference on Digital Audio Effects (DAFx-13), Maynooth, Ireland, September 2013");
 
 
 void SuperFluxExtractor::configure() {
  	
  	
- 	_windowSize = parameter("windowSize").toInt();
- 	
- 	
- 		
-	_specF->configure("size",_windowSize);
-	
-	_triF->configure("sampleRate",parameter("sampleRate").toInt());
- 	
- 	// SuperFlux Novelty Parameters
-    _binW = parameter("binWidth").toInt();    
-	_frameWi = parameter("frameWidth").toInt();
 
 
-	
-	_sfN->configure("Positive",true,
-					"frameWidth",_frameWi,
-					"binWidth",_binW)
-					
-	
-	
-	// Peak peaking parameters
-	_threshold = parameter("threshold").toReal();
-	_combine = parameter("combine").toInt();
-	
-
-	_sfP->configure(	
-	"frameRate", 172,
-    "threshold", _threshold,
-	"combine",_combine,
-    "pre_avg",  100,
-	"pre_max", 30
-	)
-
-
-// local Buffers
-circBuffer = TNT::Array2D<Real>(_windowSize/2+1,_frameWi);
-int circIdx = 0;
-tmpSpec.resize(_windowSize/2 +1);
 
 }
 
 
 void SuperFluxExtractor::compute() {
 
-  	const vector<Real>& audio = _audio.get();
-	Real& bin  = _isOnset.get();
-	
-	if(audio.size()!= _windowSize){
-	_windowSize = audio.size();
-	tmpSpec.resize(_windowSize/2 + 1);
-	}
-	
-	
-	specF->input("frame").set(audio);
-	specF->output("spectrum").set(tmpSpec);
-	
-	_triF->input("spectrum").set(tmpSpec);
-if(circBuffer.size()<_frameWi){
-	_triF->output("bands").set(circBuffer
-
-	}
-
-  int nFrames = bands.dim1();
-  int nBands= bands.dim2();
-  if(!nFrames || !nBands){
-  throw EssentiaException("SuperFluxExtractor : empty bands or frames");
-  }
-	diffs.resize(nFrames);
-	vector<Real> maxsBuffer(nBands,0);
 
 
-Real cur_diff;
-
-for (int i = _frameWi ; i< nFrames;i++){
-
-	diffs[i]=0;
-	vector<Real> tmpBuffer(bands[i-_frameWi],bands[i-_frameWi]+nBands);
-	_maxf->input("signal").set(tmpBuffer);
-	_maxf->output("signal").set(maxsBuffer);
-	_maxf->compute();
-	
-	for (int j = 0;j<nBands;j++){
-		 cur_diff= bands[i][j]-maxsBuffer[j];
-		if(!(_pos && cur_diff<0)){diffs[i] +=cur_diff ; }
-		
-	}
-	
-	//diffs[i]/=(nBands-2.*_binW);
-}
+  
 }
 
 
@@ -137,50 +59,50 @@ void SuperFluxExtractor::reset() {
 }
 
 
-// TODO in the case of lower accuracy in evaluation
-// implement post-processing steps for methods in OnsetDetection, which required it
-// wrapping the OnsetDetection algo
-// - smoothing?
-// - etc., whatever was requiered in original matlab implementations
 
-} // namespace standard
+
+
+
+
+
+
+
+// 
+
+
+
+namespace essentia {
+namespace streaming {
+
+const char* SuperFluxExtractor::name = standard::SuperFluxExtractor::name;
+const char* SuperFluxExtractor::description = standard::SuperFluxExtractor::description;
+
+
+
+AlgorithmStatus SuperFluxExtractor::process() {
+  bool producedData = false;
+
+
+    AlgorithmStatus status = acquireData();
+    if (status != OK) {
+      // acquireData() returns SYNC_OK if we could reserve both inputs and outputs
+      // being here means that there is either not enough input to process,
+      // or that the output buffer is full, in which cases we need to return from here
+      return status;
+    }
+
+    _algo->input("bands").set(_bands.tokens());
+    _algo->output("Differences").set(_diffs.tokens());
+
+    _algo->compute();
+
+    // give back the tokens that were reserved
+    releaseData();
+
+    return OK;
+  
+}
+
+
+} // namespace streaming
 } // namespace essentia
-
-
-// #include "poolstorage.h"
-// #include "algorithmfactory.h"
-// 
-// namespace essentia {
-// namespace streaming {
-// 
-// const char* SuperFluxExtractor::name = standard::SuperFluxExtractor::name;
-// const char* SuperFluxExtractor::description = standard::SuperFluxExtractor::description;
-// 
-// SuperFluxExtractor::SuperFluxExtractor() : AlgorithmComposite() {
-// 
-//   _SuperFluxExtractor = standard::AlgorithmFactory::create("SuperFluxExtractor");
-//     declareInput(_bands, "bands", "the input bands spectrogram");
-//     declareOutput(_diffs, "Differences", "SuperFluxExtractord input");
-// }
-// 
-// SuperFluxExtractor::~SuperFluxExtractor() {
-//   delete _SuperFluxExtractor;
-// 
-// }
-// 
-// void SuperFluxExtractor::reset() {
-//   AlgorithmComposite::reset();
-//   _SuperFluxExtractor->reset();
-// }
-// 
-// AlgorithmStatus SuperFluxExtractor::process() {
-//   if (!shouldStop()) return PASS;
-// 
-//   _SuperFluxExtractor->compute();
-// 
-// 
-//   return FINISHED;
-// }
-// 
-// } // namespace streaming
-// } // namespace essentia

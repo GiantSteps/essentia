@@ -120,6 +120,7 @@ void MaxFilter::compute() {
 	filtered[0]=maxs;
 	for (int i = 1 ; i < _width ; i++){
 	filtered[i]=max(maxs,array[i]);
+	maxs=filtered[i];
 	}
 	int lastj = _causal?size:size-_width;
 	for(int j = _width ; j<lastj ; j++){
