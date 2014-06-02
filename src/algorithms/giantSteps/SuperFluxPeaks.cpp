@@ -47,7 +47,6 @@ void SuperFluxPeaks::configure() {
 
 	_movAvg->configure("size",_pre_avg);
 	_maxf->configure("width",_pre_max,"Causal",true);
-cout<< ":" << this << endl;
 
 }
 
