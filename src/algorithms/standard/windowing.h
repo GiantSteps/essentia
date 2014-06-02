@@ -42,6 +42,7 @@ class Windowing : public Algorithm {
     declareParameter("zeroPadding", "the size of the zero-padding", "[0,inf)", 0);
     declareParameter("type", "the window type, which can be 'hamming', 'hann', 'triangular', 'square' or 'blackmanharrisXX'", "{hamming,hann,triangular,square,blackmanharris62,blackmanharris70,blackmanharris74,blackmanharris92}", "hann");
     declareParameter("zeroPhase", "a boolean value that enables zero-phase windowing", "{true,false}", true);
+    declareParameter("Normalize", "Normalize window, be careful with setting it to false, made for optimization only", "{true,false}", true);
   }
 
   void configure();
@@ -70,7 +71,7 @@ protected:
 
   std::vector<Real> _window;
   int _zeroPadding;
-  bool _zeroPhase;
+  bool _zeroPhase,_Normalize;
 };
 
 } // namespace standard

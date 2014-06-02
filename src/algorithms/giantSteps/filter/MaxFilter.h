@@ -37,6 +37,7 @@ class MaxFilter : public Algorithm {
 
   
   	int _width;
+  	bool _causal;
 
  public:
   MaxFilter() {
@@ -51,7 +52,9 @@ class MaxFilter : public Algorithm {
   }
 
   void declareParameters() {
-    declareParameter("width", "window size for max filter : has to be odd as the window is centered on sample", "[3,inf)", 3);
+    declareParameter("width", "window size for max filter :if centered, has to be odd ", "[3,inf)", 3);
+    declareParameter("Causal", "if the filter is causal: windows is behind current element else windows is centered around ", "{true,false}", true);
+   // declareParameter("startFromZero", "suppress first frames width", "{true,false}", true);
 
 }
 
@@ -68,26 +71,73 @@ class MaxFilter : public Algorithm {
 } // namespace standard
 } // namespace essentia
 
-#include "streamingalgorithmwrapper.h"
-
+#include "streamingalgorithm.h"
+//#include "streamingalgorithmcomposite.h"
 
 namespace essentia {
 namespace streaming {
 
-class MaxFilter : public StreamingAlgorithmWrapper {
+class MaxFilter : public Algorithm {
 
  protected:
-  Sink<vector<Real> > _array;
-  Source<vector<Real> > _filtered;
+  Sink<Real > _array;
+  Source<Real > _filtered;
 
+ std::vector <Real> buff;
+ int idx;
+ 
 
  public:
   MaxFilter(){
-    declareAlgorithm("MaxFilter");
-    declareInput(_array,TOKEN, "signal");
-    declareOutput(_filtered,TOKEN, "signal");
+    declareInput(_array,1,1, "signal","signal");
+    declareOutput(_filtered,1,1, "signal","signal");
 
   }
+  
+    void declareParameters() {
+    declareParameter("width", "window size for max filter : has to be odd as the window is centered on sample", "[3,inf)", 3);
+}
+void configure() {
+	_array.setAcquireSize(parameter("width").toInt()+1);
+	_array.setReleaseSize(1);
+	buff.resize(parameter("width").toInt()+1);
+    // _filtered.setReleaseSize(1);
+    idx =0;
+
+  }
+  
+  AlgorithmStatus process(){
+  bool producedData = false;
+
+
+	AlgorithmStatus status = acquireData();
+	if (status != OK) {
+
+	 
+	  // acquireData() returns SYNC_OK if we could reserve both inputs and outputs
+	  // being here means that there is either not enough input to process,
+	  // or that the output buffer is full, in which cases we need to return from here
+	  // cout << "peaks no fed" << endl;
+	  return status;
+	}
+
+
+	std::vector<Real> arr = _array.tokens();
+ 	Real* dst = (Real*)_filtered.getFirstToken() ;
+ 	
+ 	*dst = *std::max_element(arr.begin(),arr.end());
+
+	// give back the tokens that were reserved
+	releaseData();
+	
+
+	return OK;
+  
+  }
+  
+  
+  
+
 
 
 };

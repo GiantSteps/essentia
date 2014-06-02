@@ -19,7 +19,7 @@
 
 #include "MaxFilter.h"
 #include "essentiamath.h"
-#define HERKGIL
+//#define HERKGIL
 //TODO:Validate HERKGIL
 using namespace std;
 
@@ -35,9 +35,9 @@ const char* MaxFilter::description = DOC("Maximum filter for 1d signal (van Herk
 void MaxFilter::configure() {
  	
  	
- 	//width has to be odd, then local binW represent half the width
+ 	//width has to be odd
     _width = parameter("width").toInt();
- 
+ _causal = parameter("Causal").toBool();
 
 }
 
@@ -64,7 +64,12 @@ int kl=(_width-1)/2;
 vector<Real> cs(_width-2);
 vector<Real> ds(_width-2);
 
-
+// fill begining
+maxs=array[0];
+filtered[0]=maxs;
+for (int i = 1 ; i < kl ; i++){
+filtered[i]=max(maxs,array[i]);
+}
 
 for(int u = kl ; u<size ; u+=_width-1){
 		ds[0]=array[u];
@@ -79,7 +84,8 @@ for(int u = kl ; u<size ; u+=_width-1){
 		}
 		
 		for (int i = 0 ; i <= _width-2 ; i++){
-			filtered[u-kl+i] = max(cs[i],ds[i]);
+			// filtered[u-kl+i] = max(cs[i],ds[i]);
+			filtered[u+i] = max(cs[i],ds[i]);
 		}
 		
 	
@@ -98,16 +104,26 @@ void MaxFilter::compute() {
 
 
   	int size= array.size();
-
-	filtered.resize(size);
-	Real maxs = 0;
 	
+	if(_width>=size)throw EssentiaException("recieved signal is smaller or equal than width");
+	
+	filtered.resize(size);
+
+
 	Real cur_diff = 0;
 
-
-		//TODO : check relevance and may be go toward a less naive algorithm (Herk Gil?)
-	
-for(int j = _width ; j<size ; j++){
+	// if centered width represent half window
+	if(!_causal){
+	if(_width%2==0)_width++;
+	_width=(_width-1)/2;
+	}
+	Real	maxs=array[0];
+	filtered[0]=maxs;
+	for (int i = 1 ; i < _width ; i++){
+	filtered[i]=max(maxs,array[i]);
+	}
+	int lastj = _causal?size:size-_width;
+	for(int j = _width ; j<lastj ; j++){
 
 
 		// if the outgoing term is not last max the new max is faster to compute 
@@ -116,8 +132,8 @@ for(int j = _width ; j<size ; j++){
 			maxs = max(maxs,array[j+_width]);
 		}	
 		else{
-			maxs =array[j-_width];
-			for (int k = j-_width+1 ; k<=j+_width ; k++){
+		int last = _causal?j:j+_width;
+			for (int k = j-_width ; k<=last ; k++){
 				maxs = max(maxs,array[k]);
 			}
 		}	
@@ -139,14 +155,11 @@ void MaxFilter::reset() {
 }
 
 
-// TODO in the case of lower accuracy in evaluation
-// implement post-processing steps for methods in OnsetDetection, which required it
-// wrapping the OnsetDetection algo
-// - smoothing?
-// - etc., whatever was requiered in original matlab implementations
 
 } // namespace standard
 } // namespace essentia
+
+
 
 
 

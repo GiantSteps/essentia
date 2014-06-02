@@ -37,10 +37,8 @@ void SuperFluxNovelty::configure() {
  	//width has to be odd, then local binW represent half the width
     _binW = parameter("binWidth").toInt();
     if(_binW%2==0)_binW++;
-    _maxf->configure("width",_binW);
-    
-    
-	_binW= int((_binW-1)/2); 
+    _maxf->configure("width",_binW,"Causal",false);
+
     
 	_frameWi = parameter("frameWidth").toInt();
 
@@ -64,11 +62,16 @@ void SuperFluxNovelty::compute() {
   if(!nBands){
   throw EssentiaException("SuperFluxNovelty : empty bands ");
   }
+  E_DEBUG( EAlgorithm, "got " << nFrames <<"frames, for frameWidth" << _frameWi << "with " << nBands<<" bands");
+  if(_frameWi>=nFrames){
+  
+  throw EssentiaException("SuperFluxNovelty : no enough frames comparing to frame witdh");
+  }
   
   
 // ONLINE MODE all results are advanced by frame width, allow easier streaming mode
 // For better accuracy
-cout<<nFrames <<"et " << _frameWi << "b  " << bands.size()<<endl;
+
 if (_online){diffs.resize(nFrames-_frameWi);	}
 else { diffs.resize(nFrames);}
 
@@ -84,7 +87,7 @@ Real cur_diff;
 
 for (int i = _frameWi ; i< nFrames;i++){
 
-	diffs[i]=0;
+	diffs[i-onlinestep]=0;
 	//vector<Real> tmpBuffer(bands[i-_frameWi].begin(),bands[i-_frameWi].end());
 	_maxf->input("signal").set(bands[i-_frameWi]);
 	_maxf->output("signal").set(maxsBuffer);
@@ -98,8 +101,7 @@ for (int i = _frameWi ; i< nFrames;i++){
 		diffs[i-onlinestep] +=cur_diff ; }
 		
 	}
-	
-	//diffs[i]/=(nBands-2.*_binW);
+
 }
 return;
 }
