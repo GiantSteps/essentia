@@ -41,11 +41,13 @@ const char* Windowing::description = DOC("This algorithm applies windowing to au
 
 void Windowing::configure() {
   _window.resize(parameter("size").toInt());
-  createWindow(parameter("type").toLower());
+
 
   _zeroPadding = parameter("zeroPadding").toInt();
   _zeroPhase = parameter("zeroPhase").toBool();
   _Normalize = parameter("Normalize").toBool();
+
+createWindow(parameter("type").toLower());
 }
 
 void Windowing::createWindow(const std::string& windowtype) {
