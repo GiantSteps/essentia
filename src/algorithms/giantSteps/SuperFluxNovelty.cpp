@@ -27,7 +27,7 @@ namespace standard {
 
 
 const char* SuperFluxNovelty::name = "SuperFluxNovelty";
-const char* SuperFluxNovelty::description = DOC("Superflux algorithm : Maximum filter and differentiation for onset detection robust again vibrato"
+const char* SuperFluxNovelty::description = DOC("Novelty curve in Superflux algorithm : Maximum filter and differentiation for onset detection robust again vibrato"
 "Input : filterbank like spectrogram");
 
 

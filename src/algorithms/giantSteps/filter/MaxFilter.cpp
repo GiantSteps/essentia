@@ -20,7 +20,7 @@
 #include "MaxFilter.h"
 #include "essentiamath.h"
 //#define HERKGIL
-//TODO:Validate HERKGIL
+//TODO:Validate and adapt for onlinemode HERKGIL
 
 namespace essentia {
 namespace standard {
@@ -120,19 +120,22 @@ void MaxFilter::compute() {
 	filtered[0]=maxs;
 	for (int i = 1 ; i < _width ; i++){
 	filtered[i]=max(maxs,array[i]);
+	maxs=filtered[i];
 	}
+	
 	int lastj = _causal?size:size-_width;
+	
+	
 	for(int j = _width ; j<lastj ; j++){
-
-
-		// if the outgoing term is not last max the new max is faster to compute 
-
+		// if the outgoing term is not last max the new max is faster to compute
+		int lastk = _causal?j:j+_width;
 		if(j>_width && array[j-_width-1]<maxs){
-			maxs = max(maxs,array[j+_width]);
+			maxs = max(maxs,array[lastk]);
 		}	
 		else{
-		int last = _causal?j:j+_width;
-			for (int k = j-_width ; k<=last ; k++){
+			
+			maxs =array[j-_width];
+			for (int k = j-_width+1 ; k<=lastk ; k++){
 				maxs = max(maxs,array[k]);
 			}
 		}	

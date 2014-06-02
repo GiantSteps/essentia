@@ -21,43 +21,34 @@
 #define ESSENTIA_SUPERFLUXEXTRACTOR_H
 
 #include "algorithmfactory.h"
+using namespace std;
 
 namespace essentia {
-namespace standard {
+namespace streaming {
 
-class SuperFluxExtractor : public Algorithm {
+class SuperFluxExtractor : public Algorithm{
 
  private:
  
-  Input<std::vector<Real>  > _audio;
-  Output<Real> _isOnset;
+  Input<std::vector< std::vector<Real> >  > _bands;
+  Output<std::vector<Real> > _diffs;
 
 
   
   	int _binW;
   	int _frameWi;
-	bool _pos;
-	
-	vector<Real> tmpSpec;
-	
+	bool _online;
 
-std::queue<vector<Real> > circBuffer;
-int circIdx;
 
-	Algorithm* _specF;
-	Algorithm* _triF;
-	Algorithm* _sfN;
-	Algorithm* _sfP;
+	Algorithm *w,*spectrum,*triF,*superFluxF,*superFluxP, * fc,*centroidF;
 
 
  public:
   SuperFluxExtractor() {
-    declareInput(_bands, "bands", "the input bands spectrogram");
+    declareInput(signal, "bands", "the input bands spectrogram");
     declareOutput(_diffs, "Differences", "SuperFluxExtractord input");
-	_sfN = AlgorithmFactory::create("SuperFluxNovelty");
-	_sfP = AlgorithmFactory::create("SuperFluxPeaks");
-	_specF = AlgorithmFactory::create("Spectrum");
-	_triF = AlgorithmFactory::create("TriangularBands");
+	_maxf = AlgorithmFactory::create("MaxFilter");
+    
   }
 
   ~SuperFluxExtractor() {
@@ -65,21 +56,9 @@ int circIdx;
   }
 
   void declareParameters() {
-  
-    declareParameter("sampleRate", "SampleRate of audio signal", "(0,inf)", 44100);
-    declareParameter("windowSize", "windowSize", "(0,inf)", 2048);
-    
-    //novelty
     declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxExtractorFilter", "[3,inf)", 3);
 	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 2);
-	
-	//peaks
-	declareParameter("frameRate", "frameRate", "(0,inf)", 172);
-    declareParameter("threshold", "threshold for peak-picking", "(0,inf)", 1.25);
-	declareParameter("combine", "ms for onset combination", "(0,inf)", 30);
-    declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100);
-	declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30);
-	
+	declareParameter("Online", "realign output with audio by frameWidth ; if using streaming mode : set it to true, else for static precision measurement: use false", "{false,true}", false);
 }
 
   void reset();
@@ -95,54 +74,58 @@ int circIdx;
 } // namespace standard
 } // namespace essentia
 
+
+#include "streamingalgorithm.h"
 // #include "streamingalgorithmcomposite.h"
-// #include "pool.h"
-// 
-// namespace essentia {
-// namespace streaming {
-// 
-// class SuperFluxExtractor : public AlgorithmComposite {
-// 
-//  protected:
-//   SinkProxy<Real> _bands;
-//   Source<Real> _diffs;
-// 
-// 
-//   Pool _pool;
-//   Algorithm* _poolStorage;
-//   standard::Algorithm * _SuperFluxExtractor;
-// 
-// 
-//  public:
-//   SuperFluxExtractor();
-//   ~SuperFluxExtractor();
-// 
-//   void declareParameters() {
-//     declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxExtractorFilter", "[3,inf)", 3);
-// 	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 5);
-//   }
-// 
-//   void configure() {
-//     _SuperFluxExtractor->configure(
-//                                      INHERIT("frameWidth"),
-//                                      INHERIT("binWidth")
-//                                      );
-//   }
-// 
-//   void declareProcessOrder() {
-//     declareProcessStep(SingleShot(_poolStorage));
-//     declareProcessStep(SingleShot(this));
-//   }
-// 
-//   AlgorithmStatus process();
-//   void reset();
-// 
-//   static const char* name;
-//   static const char* description;
-// 
-// };
-// 
-// } // namespace streaming
-// } // namespace essentia
-// 
-// #endif // ESSENTIA_SuperFluxExtractor_H
+namespace essentia {
+namespace streaming {
+
+class SuperFluxExtractor : public Algorithm {
+
+ protected:
+  Sink< vector<Real> > _bands;
+   Source<Real  > _diffs;
+  
+  
+  essentia::standard::Algorithm* _algo;
+
+int bufferSize=3;
+
+ public:
+  SuperFluxExtractor(){
+    _algo = standard::AlgorithmFactory::create("SuperFluxExtractor");
+    declareInput(_bands, bufferSize,1,"bands","the input bands spectrogram");
+    declareOutput(_diffs,1,"Differences","SuperFlux");
+
+  }
+
+
+
+
+  void declareParameters() {
+    declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxExtractorFilter", "[3,inf)", 3);
+	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 2);
+	declareParameter("Online", "realign output with audio by frameWidth : if using streaming mode set it to true, else for static precision measurement, use false", "{false,true}", true);
+  }
+   
+void configure() {
+     _algo->configure(_params);
+	_bands.setAcquireSize(_algo->parameter("frameWidth").toInt()+1);
+    _bands.setReleaseSize(1);
+
+  }
+
+  AlgorithmStatus process();
+  void reset(){
+//   _algo->reset();
+  };
+
+  static const char* name;
+  static const char* description;
+
+};
+
+} // namespace streaming
+} // namespace essentia
+
+#endif // ESSENTIA_SuperFluxExtractor_H

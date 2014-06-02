@@ -46,7 +46,7 @@ class SuperFluxPeaks : public Algorithm {
 	bool _rawMode;
 	bool _startZero;
 
-int lastPidx =-1 ;
+int lastPidx ;
 
  public:
   SuperFluxPeaks() {
@@ -116,7 +116,7 @@ bool _rawmode;
     declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100);
 	declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30);
 	declareParameter("rawmode", "output mode: if true, returns array of same size as novelty function, with 1 where peaks stands, if false, output list of peaks instants", "{true,false}", true);
-	declareParameter("startFromZero", "output starts at 0 if not starts at frame corresponding max(pre_avg,pre_max)", "{true,false}", false);
+	declareParameter("startFromZero", "if true; output starts at 0, if false; starts at frame corresponding max(pre_avg,pre_max)", "{true,false}", false);
   };
 
 
@@ -125,7 +125,7 @@ bool _rawmode;
 void configure(){
 EXEC_DEBUG("configuring Peaks");
 _algo->configure(this->_params);
-int aqS = 1+ _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000;
+int aqS =  _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000;
     EXEC_DEBUG("setAcquireSize" << aqS);
     _signal.setAcquireSize(aqS);
     _signal.setReleaseSize(1);

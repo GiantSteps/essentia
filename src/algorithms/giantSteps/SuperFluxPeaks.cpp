@@ -17,6 +17,8 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
+
+//TODO: create a real streaming mode and not standard mode hack...
 #include "SuperFluxPeaks.h"
 #include <complex>
 #include <limits>
@@ -47,6 +49,8 @@ void SuperFluxPeaks::configure() {
 
 	_movAvg->configure("size",_pre_avg);
 	_maxf->configure("width",_pre_max,"Causal",true);
+	
+	lastPidx = -1;
 
 }
 
@@ -69,17 +73,27 @@ Real _threshold = parameter("threshold").toReal();
 
 
 	vector<Real> avg(size);
-
+	_movAvg->reset();
 	_movAvg->input("signal").set(signal);
 	_movAvg->output("signal").set(avg);
 	_movAvg->compute();
+
 
 	vector<Real> maxs(size);
 
 	_maxf->input("signal").set(signal);
 	_maxf->output("signal").set(maxs);
 	_maxf->compute();
-
+/*	for (int i = 0 ; i < maxs.size();i++){
+	cout <<maxs[i] << ",";
+	}cout << endl;
+	for (int i = 0 ; i < signal.size();i++){
+	cout <<signal[i] << ",";
+	}cout << endl;
+	for (int i = 0 ; i < avg.size();i++){
+	cout <<avg[i] << ",";
+	}cout << endl;
+*/
 
 // bool isStream = size <= max(_pre_avg,_pre_max )+1;
 E_DEBUG(EAlgorithm,"sfpeaks size " << size <<"peaksS" << peaks.size());
@@ -95,7 +109,7 @@ if(_rawMode){
 	if(peaks.size()!=size)peaks.resize(size);
 	}
 	else{
-	zeroStep = max(_pre_avg,_pre_max);
+	zeroStep = max(_pre_avg,_pre_max)-1;
 	if(peaks.size()!=size-zeroStep)peaks.resize(size-zeroStep);
 	}
 	for( int i =zeroStep ; i < size;i++){
@@ -104,7 +118,7 @@ if(_rawMode){
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
 			if(!(lastPidx<_combine*frameRate  &&  lastPidx >=0)) {
 				E_DEBUG(EAlgorithm,"peakDetected");
-				E_DEBUG(EAlgorithm,signal[i] <<"/" << avg[i] <<"/" <<  _threshold <<"/" <<  maxs[i]);
+				//cout <<"/" << avg.size() <<"/" <<  _threshold <<"/" <<  maxs.size()<<endl;
 				peaks[i-zeroStep]=signal[i];	
 				lastPidx = 0;
 			}	
