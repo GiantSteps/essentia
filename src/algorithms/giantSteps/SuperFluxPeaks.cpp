@@ -81,6 +81,15 @@ Real _threshold = parameter("threshold").toReal();
 	_maxf->input("signal").set(signal);
 	_maxf->output("signal").set(maxs);
 	_maxf->compute();
+	for (int i = 0 ; i < maxs.size();i++){
+	cout <<maxs[i] << ",";
+	}cout << endl;
+	for (int i = 0 ; i < signal.size();i++){
+	cout <<signal[i] << ",";
+	}cout << endl;
+	for (int i = 0 ; i < avg.size();i++){
+	cout <<avg[i] << ",";
+	}cout << endl;
 
 
 // bool isStream = size <= max(_pre_avg,_pre_max )+1;
