@@ -47,6 +47,8 @@ void SuperFluxPeaks::configure() {
 
 	_movAvg->configure("size",_pre_avg);
 	_maxf->configure("width",_pre_max,"Causal",true);
+	
+	lastPidx = -1;
 
 }
 
@@ -104,7 +106,7 @@ if(_rawMode){
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
 			if(!(lastPidx<_combine*frameRate  &&  lastPidx >=0)) {
 				E_DEBUG(EAlgorithm,"peakDetected");
-				E_DEBUG(EAlgorithm,signal[i] <<"/" << avg[i] <<"/" <<  _threshold <<"/" <<  maxs[i]);
+				cout <<"/" << avg[i] <<"/" <<  _threshold <<"/" <<  maxs[i])<<endl;
 				peaks[i-zeroStep]=signal[i];	
 				lastPidx = 0;
 			}	
