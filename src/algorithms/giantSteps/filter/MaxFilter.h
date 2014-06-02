@@ -106,40 +106,7 @@ void configure() {
 
   }
   
-  AlgorithmStatus process(){
-  bool producedData = false;
-
-
-	AlgorithmStatus status = acquireData();
-	if (status != OK) {
-
-	 
-	  // acquireData() returns SYNC_OK if we could reserve both inputs and outputs
-	  // being here means that there is either not enough input to process,
-	  // or that the output buffer is full, in which cases we need to return from here
-	  // cout << "peaks no fed" << endl;
-	  return status;
-	}
-
-
-	std::vector<Real> arr = _array.tokens();
- 	Real* dst = (Real*)_filtered.getFirstToken() ;
- 	
- 	*dst = *std::max_element(arr.begin(),arr.end());
-
-	// give back the tokens that were reserved
-	releaseData();
-	
-
-	return OK;
-  
-  }
-  
-  
-  
-
-
-
+  AlgorithmStatus process();   
 };
 
 } // namespace streaming
