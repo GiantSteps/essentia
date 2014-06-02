@@ -17,6 +17,8 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
+
+//TODO: create a real streaming mode and not standard mode hack...
 #include "SuperFluxPeaks.h"
 #include <complex>
 #include <limits>
@@ -76,6 +78,7 @@ Real _threshold = parameter("threshold").toReal();
 	_movAvg->output("signal").set(avg);
 	_movAvg->compute();
 
+
 	vector<Real> maxs(size);
 
 	_maxf->input("signal").set(signal);
@@ -106,8 +109,8 @@ if(_rawMode){
 	if(peaks.size()!=size)peaks.resize(size);
 	}
 	else{
-	zeroStep = max(_pre_avg,_pre_max);
-	if(peaks.size()!=size-zeroStep)peaks.resize(size-zeroStep);
+	zeroStep = max(_pre_avg,_pre_max)-1;
+	//if(peaks.size()!=size-zeroStep)peaks.resize(size-zeroStep);
 	}
 	for( int i =zeroStep ; i < size;i++){
 		peaks[i-zeroStep]=0;
