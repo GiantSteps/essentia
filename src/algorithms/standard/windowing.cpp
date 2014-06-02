@@ -45,6 +45,7 @@ void Windowing::configure() {
 
   _zeroPadding = parameter("zeroPadding").toInt();
   _zeroPhase = parameter("zeroPhase").toBool();
+  _Normalize = parameter("Normalize").toBool();
 }
 
 void Windowing::createWindow(const std::string& windowtype) {
@@ -57,7 +58,7 @@ void Windowing::createWindow(const std::string& windowtype) {
   else if (windowtype == "blackmanharris74") blackmanHarris74();
   else if (windowtype == "blackmanharris92") blackmanHarris92();
 
-  normalize();
+ if(_Normalize){ normalize();}
 }
 
 void Windowing::compute() {
@@ -70,6 +71,8 @@ void Windowing::compute() {
 
   if (signal.size() != _window.size()) {
     _window.resize(signal.size());
+    
+    E_DEBUG( EAlgorithm, "signal different than window size" << signal.size());
     createWindow(parameter("type").toLower());
   }
 
@@ -185,6 +188,7 @@ void Windowing::blackmanHarris92() {
 
 
 void Windowing::normalize() {
+//cout << "fdsgsjflfdksjfdslfkjdfslkj" << _Normalize <<endl;
   const int size = _window.size();
   Real sum = 0.0;
   for (int i=0; i<size; i++) {

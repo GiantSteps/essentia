@@ -44,6 +44,7 @@ void Triangularbands::configure() {
       throw EssentiaException("Triangularbands: the values in the 'Triangularbands' parameter are not in ascending order or there exists a duplicate value");
     }
   }
+  _isLog = parameter("Log").toBool();
 }
 
 void Triangularbands::compute() {
@@ -89,6 +90,7 @@ void Triangularbands::compute() {
 
       bands[i] += sqrt(magSquared);
     }
+    if(_isLog){bands[i] = log10(1+bands[i]);}
   }
 
 }

@@ -40,18 +40,25 @@ void SuperFluxPeaks::configure() {
 	// convert to seconds
 	_combine = parameter("combine").toReal()/1000.;
 
-	_threshold = parameter("threshold").toInt();
+// 	_threshold = parameter("threshold").toReal();
 	
 	_rawMode = parameter("rawmode").toBool();
+	_startZero = parameter("startFromZero").toBool();
 
-	_movAvg->configure("size",_pre_avg+1);
-	_maxf->configure("width",_pre_max+1);
-
+	_movAvg->configure("size",_pre_avg);
+	_maxf->configure("width",_pre_max,"Causal",true);
+cout<< ":" << this << endl;
 
 }
 
 
 void SuperFluxPeaks::compute() {
+// RT parameters
+
+Real _threshold = parameter("threshold").toReal();
+// cout<< _threshold << ":" << this << endl;
+
+
   	const vector<Real>& signal = _signal.get();
 	vector<Real>& peaks = _peaks.get();
   	if (signal.empty()) {
@@ -74,35 +81,60 @@ void SuperFluxPeaks::compute() {
 	_maxf->output("signal").set(maxs);
 	_maxf->compute();
 
-bool isStream = size <= max(_pre_avg,_pre_max )+1;
 
-if (!isStream)peaks.resize(size);
-	// Streaming mode hack, when >0 onset detected
+// bool isStream = size <= max(_pre_avg,_pre_max )+1;
+E_DEBUG(EAlgorithm,"sfpeaks size " << size <<"peaksS" << peaks.size());
+E_DEBUG(EAlgorithm,"maxSize" << maxs.size() <<"/" << _pre_max << "mov avgsize " << avg.size()<< "/" << _pre_avg);
 
+
+
+if(_rawMode){
 	
+	int zeroStep;
+	if(_startZero){
+	zeroStep = 0;
+	if(peaks.size()!=size)peaks.resize(size);
+	}
+	else{
+	zeroStep = max(_pre_avg,_pre_max);
+	if(peaks.size()!=size-zeroStep)peaks.resize(size-zeroStep);
+	}
+	for( int i =zeroStep ; i < size;i++){
+		peaks[i-zeroStep]=0;
+		if(lastPidx>=0)lastPidx++;
+		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
+			if(!(lastPidx<_combine*frameRate  &&  lastPidx >=0)) {
+				E_DEBUG(EAlgorithm,"peakDetected");
+				E_DEBUG(EAlgorithm,signal[i] <<"/" << avg[i] <<"/" <<  _threshold <<"/" <<  maxs[i]);
+				peaks[i-zeroStep]=signal[i];	
+				lastPidx = 0;
+			}	
+		}	
+	}
+	
+}
+else{
+	peaks.reserve(size);
 	int nDetec=0;
 	Real peakTime = 0;
 	for( int i =0 ; i < size;i++){
-		if(_rawMode){peaks[i]=0;}
-		cout << signal[i] <<"  " << maxs[i] <<"  " << avg[i] << endl;
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
+
 			peakTime = i/frameRate;
 			if((nDetec>0 && peakTime-peaks[nDetec-1]>_combine)  ||  nDetec ==0) {
-				if(_rawMode){
-				peaks[i]=1;
-				}
-				else{
-					peaks[nDetec]=peakTime;
-					
-					}
+				peaks[nDetec]=peakTime;
 				nDetec++;
+			
 			}
 		}
 		
 		
 	}
 
-	if(!_rawMode)peaks.resize(nDetec);
+peaks.resize(nDetec);
+
+	
+}
 
 return;
  
@@ -140,13 +172,26 @@ AlgorithmStatus SuperFluxPeaks::process() {
 	  // cout << "peaks no fed" << endl;
 	  return status;
 	}
-cout << "peaks fed" << endl;
+	
+	if(!_rawmode){
+	vector<Real> peaks;
 	_algo->input("novelty").set(_signal.tokens());
-	_algo->output("peaks").set(_peaks.tokens());
+	_algo->output("peaks").set(peaks);
 
 	_algo->compute();
-	cout << _peaks.tokens()[0] << endl;
-
+	
+	_peaks.setAcquireSize(peaks.size());
+	_peaks.setReleaseSize(peaks.size());
+	for (int i = 0 ; i < peaks.size();i++){
+	_peaks.tokens()[i]=peaks[i];
+	}
+// 	fastcopy(&_peaks.tokens(),&peaks,peaks.size());
+}
+else{
+	_algo->input("novelty").set(_signal.tokens());
+	_algo->output("peaks").set(_peaks.tokens());
+	_algo->compute();
+}
 	// give back the tokens that were reserved
 	releaseData();
 
