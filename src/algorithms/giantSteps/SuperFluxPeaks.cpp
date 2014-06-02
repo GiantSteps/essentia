@@ -106,7 +106,7 @@ if(_rawMode){
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
 			if(!(lastPidx<_combine*frameRate  &&  lastPidx >=0)) {
 				E_DEBUG(EAlgorithm,"peakDetected");
-				cout <<"/" << avg[i] <<"/" <<  _threshold <<"/" <<  maxs[i])<<endl;
+				cout <<"/" << avg[i] <<"/" <<  _threshold <<"/" <<  maxs[i]<<endl;
 				peaks[i-zeroStep]=signal[i];	
 				lastPidx = 0;
 			}	
