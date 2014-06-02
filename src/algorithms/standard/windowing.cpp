@@ -188,7 +188,7 @@ void Windowing::blackmanHarris92() {
 
 
 void Windowing::normalize() {
-cout << "fdsgsjflfdksjfdslfkjdfslkj" << _Normalize <<endl;
+//cout << "fdsgsjflfdksjfdslfkjdfslkj" << _Normalize <<endl;
   const int size = _window.size();
   Real sum = 0.0;
   for (int i=0; i<size; i++) {
