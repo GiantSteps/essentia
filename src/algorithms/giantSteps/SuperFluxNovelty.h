@@ -57,7 +57,7 @@ class SuperFluxNovelty : public Algorithm{
 
   void declareParameters() {
     declareParameter("binWidth", "height(n of frequency bins) of the SuperFluxNoveltyFilter", "[3,inf)", 3);
-	declareParameter("frameWidth", "number of frame for differentiation", "(0,inf)", 2);
+	declareParameter("frameWidth", "differenciate with the N-th previous frame", "(0,inf)", 2);
 	declareParameter("Online", "realign output with audio by frameWidth ; if using streaming mode : set it to true, else for static precision measurement: use false", "{false,true}", false);
 }
 
@@ -89,7 +89,7 @@ class SuperFluxNovelty : public Algorithm {
   
   essentia::standard::Algorithm* _algo;
 
-int bufferSize=3;
+int bufferSize=20;
 
  public:
   SuperFluxNovelty(){
@@ -112,6 +112,7 @@ void configure() {
      _algo->configure(_params);
 	_bands.setAcquireSize(_algo->parameter("frameWidth").toInt()+1);
     _bands.setReleaseSize(1);
+    if(!_algo->parameter("Online").toBool()) throw EssentiaException("atm, can not be in streaming mode without online option set to true");
 
   }
 
