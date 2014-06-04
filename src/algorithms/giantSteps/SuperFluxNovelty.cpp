@@ -159,7 +159,7 @@ AlgorithmStatus SuperFluxNovelty::process() {
     // revert order in input buffer to respect chronological ascending index used by differentiation
 vector <vector < Real> > tmp(_bands.tokens());
 std::reverse(tmp.begin(),tmp.end());
-    _algo->input("bands").set(_bands.tokens());
+    _algo->input("bands").set(tmp);
     _algo->output("Differences").set(_diffs.tokens());
 	
     _algo->compute();

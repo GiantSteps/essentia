@@ -116,26 +116,25 @@ void MaxFilter::compute() {
 	if(_width%2==0)_width++;
 	_width=(_width-1)/2;
 	}
-	Real	maxs=array[0];
+	Real maxs=array[0];
 	filtered[0]=maxs;
 	for (int i = 1 ; i < _width ; i++){
 	filtered[i]=max(maxs,array[i]);
 	maxs=filtered[i];
 	}
 	
-	//int lastj = _causal?size:size-_width;
-	
-	
+
 	for(int j = _width ; j<size ; j++){
 		// if the outgoing term is not last max the new max is faster to compute
-		int lastk = _causal?j:min(j+_width,size);
+		
+		int wmax = _causal?j:min(j+_width,size);
 		if(j>_width && array[j-_width-1]<maxs){
-			maxs = max(maxs,array[lastk]);
+			maxs = max(maxs,array[wmax]);
 		}	
 		else{
 			
 			maxs =array[j-_width];
-			for (int k = j-_width+1 ; k<=lastk ; k++){
+			for (int k = j-_width+1 ; k<=wmax ; k++){
 				maxs = max(maxs,array[k]);
 			}
 		}	
