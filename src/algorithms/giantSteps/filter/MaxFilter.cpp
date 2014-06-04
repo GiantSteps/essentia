@@ -123,12 +123,12 @@ void MaxFilter::compute() {
 	maxs=filtered[i];
 	}
 	
-	int lastj = _causal?size:size-_width;
+	//int lastj = _causal?size:size-_width;
 	
 	
-	for(int j = _width ; j<lastj ; j++){
+	for(int j = _width ; j<size ; j++){
 		// if the outgoing term is not last max the new max is faster to compute
-		int lastk = _causal?j:j+_width;
+		int lastk = _causal?j:min(j+_width,size);
 		if(j>_width && array[j-_width-1]<maxs){
 			maxs = max(maxs,array[lastk]);
 		}	
