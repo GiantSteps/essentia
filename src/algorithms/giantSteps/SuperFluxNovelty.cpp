@@ -85,13 +85,13 @@ void SuperFluxNovelty::compute() {
 
 	diffs[i-onlinestep]=0;
 	//vector<Real> tmpBuffer(bands[i-_frameWi].begin(),bands[i-_frameWi].end());
-	_maxf->input("signal").set(bands[i-_frameWi]);
+	_maxf->input("signal").set(bands[i]);
 	_maxf->output("signal").set(maxsBuffer);
 	_maxf->compute();
 	
 	cur_diff = 0;
 	for (int j = 0;j<nBands;j++){
-		cur_diff= bands[i][j]-maxsBuffer[j];
+		cur_diff= bands[i-_frameWi][j]-maxsBuffer[j];
 		if(cur_diff>0){diffs[i-onlinestep] +=cur_diff ; }
 		
 	}
