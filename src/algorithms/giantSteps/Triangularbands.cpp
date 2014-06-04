@@ -33,27 +33,22 @@ const char* Triangularbands::description = DOC("This algorithm computes the ener
 void Triangularbands::configure() {
   _bandFrequencies = parameter("frequencyBands").toVectorReal();
   _sampleRate = parameter("sampleRate").toReal();
-  if ( _bandFrequencies.size() < 2 ) {
-    throw EssentiaException("Triangularbands: the 'Triangularbands' parameter contains only one element (i.e. two elements are required to construct a band)");
-  }
+  if ( _bandFrequencies.size() < 2 ) {throw EssentiaException("Triangularbands: the 'Triangularbands' parameter contains only one element (i.e. two elements are required to construct a band)");}
   for (int i = 1; i < int(_bandFrequencies.size()); ++i) {
-    if ( _bandFrequencies[i] < 0 ) {
-      throw EssentiaException("Triangularbands: the 'Triangularbands' parameter contains a negative value");
-    }
-    if (_bandFrequencies[i-1] >= _bandFrequencies[i] ) {
-      throw EssentiaException("Triangularbands: the values in the 'Triangularbands' parameter are not in ascending order or there exists a duplicate value");
-    }
+    if ( _bandFrequencies[i] < 0 ) {throw EssentiaException("Triangularbands: the 'Triangularbands' parameter contains a negative value");}
+    if (_bandFrequencies[i-1] >= _bandFrequencies[i] ) {throw EssentiaException("Triangularbands: the values in the 'Triangularbands' parameter are not in ascending order or there exists a duplicate value");}
   }
   _isLog = parameter("Log").toBool();
 }
+
+
+
 
 void Triangularbands::compute() {
   const std::vector<Real>& spectrum = _spectrumInput.get();
   std::vector<Real>& bands = _bandsOutput.get();
 
-  if (spectrum.size() <= 1) {
-    throw EssentiaException("Triangularbands: the size of the input spectrum is not greater than one");
-  }
+  if (spectrum.size() <= 1) {throw EssentiaException("Triangularbands: the size of the input spectrum is not greater than one");}
 
   Real frequencyscale = (_sampleRate / 2.0) / (spectrum.size() - 1);
   int nBands = int(_bandFrequencies.size() - 2);
@@ -67,36 +62,31 @@ void Triangularbands::compute() {
     int endBin = int(_bandFrequencies[i + 2] / frequencyscale +.5);
 
 	// finished
-    if (startBin >= int(spectrum.size())) {
-      break;
-    }
+    if (startBin >= int(spectrum.size())) {break;}
 	// going to far
-    if (endBin > int(spectrum.size())) {
-      endBin = spectrum.size();
-    }
-	bands[i] = 0;
+    if (endBin > int(spectrum.size())) {endBin = spectrum.size();}
+	
+	//Compute normalization factor
 	Real norm=0;
-	for (int j=startBin; j<=endBin; j++) {
-    	 norm+=  j<midBin? (j-startBin)/(midBin - startBin) : 1-(j-midBin)/(endBin-midBin);	
-    }
+	for (int j=startBin; j<=endBin; j++) {norm+=  j<midBin? (j-startBin)/(midBin - startBin) : 1-(j-midBin)/(endBin-midBin);}
+    
     for (int j=startBin; j<=endBin; j++) {
     Real TriangF;
     if(midBin!=startBin && midBin!= endBin && endBin!=startBin){
-
     	TriangF = j<midBin? (j-startBin)/(midBin - startBin) : 1-(j-midBin)/(endBin-midBin);
     	TriangF/=norm;
-    	
-
 	}
+	// case of single bin band
 	else if (startBin== endBin){
 		TriangF = 1;
 	}
+	//double bin band
 	else{
 		TriangF = 0.5;
 	}
-      bands[i] += TriangF * spectrum[j] * spectrum[j];
-
-       
+	
+	
+      bands[i] += TriangF * spectrum[j] * spectrum[j]; 
     }
     if(_isLog){bands[i] = log10(1+bands[i]);}
   }
