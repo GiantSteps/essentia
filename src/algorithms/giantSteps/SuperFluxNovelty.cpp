@@ -151,7 +151,8 @@ AlgorithmStatus SuperFluxNovelty::process() {
       // or that the output buffer is full, in which cases we need to return from here
       return status;
     }
-	cout << _bands.tokens() << endl;
+vector <vector < Real> > tmp(_bands.tokens());
+std::reverse(tmp.begin(),tmp.end());
     _algo->input("bands").set(_bands.tokens());
     _algo->output("Differences").set(_diffs.tokens());
 	
