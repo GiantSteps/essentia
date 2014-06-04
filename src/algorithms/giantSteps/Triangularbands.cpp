@@ -57,9 +57,11 @@ void Triangularbands::compute() {
   std::fill(bands.begin(), bands.end(), (Real) 0.0);
 
   for (int i=0; i<nBands; i++) {
+
     int startBin = int(_bandFrequencies[i] / frequencyscale +.5);
     int midBin = int(_bandFrequencies[i + 1] / frequencyscale +.5 );
     int endBin = int(_bandFrequencies[i + 2] / frequencyscale +.5);
+  
 
 	// finished
     if (startBin >= int(spectrum.size())) {break;}
@@ -68,7 +70,7 @@ void Triangularbands::compute() {
 	
 	//Compute normalization factor
 	Real norm=0;
-	for (int j=startBin; j<=endBin; j++) {norm+=  j<midBin? (j-startBin)/(midBin - startBin) : 1-(j-midBin)/(endBin-midBin);}
+	if(midBin!=startBin && midBin!= endBin && endBin!=startBin)for (int j=startBin; j<=endBin; j++) {norm+=  j<midBin? (j-startBin)/(midBin - startBin) : 1-(j-midBin)/(endBin-midBin);}
     
     for (int j=startBin; j<=endBin; j++) {
     Real TriangF;
