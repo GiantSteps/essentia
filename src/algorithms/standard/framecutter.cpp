@@ -208,6 +208,7 @@ void FrameCutter::configure() {
                             "is centered on the beginning of the audio)");
   }
   _validFrameThreshold = (int)round(ratio*_frameSize);
+ 
   // Adding noise to avoid divisions by zero (in case the user chooses to do so
   // by setting the silentFrames parameter to ADD_NOISE).  The level of such noise
   // is chosen to be -100dB because it will still be detected as a silent frame

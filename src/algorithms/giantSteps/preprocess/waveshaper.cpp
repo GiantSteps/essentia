@@ -84,7 +84,7 @@ if (_symmetric){
 	
 	start= _curxpts.size();
  	if( _curxpts[0]==0){
- 	cout<<"av"<<endl;
+ 	//cout<<"av"<<endl;
  	avoidDouble = -1;}
 
 }
@@ -100,10 +100,10 @@ if (avoidDouble!=0){
 }
 
 // setup the spline
-cout<<"val"<<endl;
-for (int i = 0 ; i < _xpts.size();i++){
-cout<<_xpts[i]<<endl;
-}
+//cout<<"val"<<endl;
+// for (int i = 0 ; i < _xpts.size();i++){
+// cout<<_xpts[i]<<endl;
+// }
 				
 _s.set_points(_xpts,_ypts);
 

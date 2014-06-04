@@ -69,23 +69,19 @@ void SuperFluxNovelty::compute() {
   }
   
   
-// ONLINE MODE all results are advanced by frame width, allow easier streaming mode
-// For better accuracy
+// ONLINE MODE all results are advanced by frame width
 
-if (_online){diffs.resize(nFrames-_frameWi);	}
-else { diffs.resize(nFrames);}
+  if (_online){diffs.resize(nFrames-_frameWi);	}
+  else { diffs.resize(nFrames);}
 
-	int onlinestep = _online?_frameWi:0;	
+  int onlinestep = _online?_frameWi:0;	
 
-
-
-
-	vector<Real> maxsBuffer(nBands,0);
+  vector<Real> maxsBuffer(nBands,0);
 
 
-Real cur_diff;
+  Real cur_diff;
 
-for (int i = _frameWi ; i< nFrames;i++){
+  for (int i = _frameWi ; i< nFrames;i++){
 
 	diffs[i-onlinestep]=0;
 	//vector<Real> tmpBuffer(bands[i-_frameWi].begin(),bands[i-_frameWi].end());
@@ -93,12 +89,10 @@ for (int i = _frameWi ; i< nFrames;i++){
 	_maxf->output("signal").set(maxsBuffer);
 	_maxf->compute();
 	
-
+	cur_diff = 0;
 	for (int j = 0;j<nBands;j++){
-		 cur_diff= bands[i][j]-maxsBuffer[j];
-		if(cur_diff>0){
-		
-		diffs[i-onlinestep] +=cur_diff ; }
+		cur_diff= bands[i][j]-maxsBuffer[j];
+		if(cur_diff>0){diffs[i-onlinestep] +=cur_diff ; }
 		
 	}
 
@@ -160,7 +154,7 @@ AlgorithmStatus SuperFluxNovelty::process() {
 
     _algo->input("bands").set(_bands.tokens());
     _algo->output("Differences").set(_diffs.tokens());
-
+	
     _algo->compute();
 
     // give back the tokens that were reserved

@@ -84,7 +84,7 @@ class MovingAverage : public StreamingAlgorithmWrapper {
   }
   
   void configure(){
-  cout<<"configuration mAvg"<<endl;
+  //cout<<"configuration mAvg"<<endl;
   }
 };
 
