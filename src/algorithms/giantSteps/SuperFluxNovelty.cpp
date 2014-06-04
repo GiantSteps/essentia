@@ -91,10 +91,14 @@ void SuperFluxNovelty::compute() {
 	
 	cur_diff = 0;
 	for (int j = 0;j<nBands;j++){
-		cur_diff= bands[i][j]-maxsBuffer[j];
-		if(cur_diff>0){diffs[i-onlinestep] +=cur_diff ; }
+		cur_diff= bands[i][j]-bands[i-_frameWi][j];//maxsBuffer[j];
+		if(cur_diff>0.01){diffs[i-onlinestep] +=cur_diff ; }
+
 		
 	}
+// 	if (diffs[i-onlinestep]>0.1){
+// 		cout << "positive" << endl;
+// 		}
 
 }
 return;
@@ -155,7 +159,7 @@ AlgorithmStatus SuperFluxNovelty::process() {
     // revert order in input buffer to respect chronological ascending index used by differentiation
 vector <vector < Real> > tmp(_bands.tokens());
 std::reverse(tmp.begin(),tmp.end());
-    _algo->input("bands").set(tmp);
+    _algo->input("bands").set(_bands.tokens());
     _algo->output("Differences").set(_diffs.tokens());
 	
     _algo->compute();
