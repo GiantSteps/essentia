@@ -84,17 +84,20 @@ void SuperFluxNovelty::compute() {
   for (int i = _frameWi ; i< nFrames;i++){
 
 	diffs[i-onlinestep]=0;
-	//vector<Real> tmpBuffer(bands[i-_frameWi].begin(),bands[i-_frameWi].end());
 	_maxf->input("signal").set(bands[i-_frameWi]);
 	_maxf->output("signal").set(maxsBuffer);
 	_maxf->compute();
 	
 	cur_diff = 0;
+	//cout<<bands[i][15]<<"//"<<bands[i-_frameWi][15]<<endl;
 	for (int j = 0;j<nBands;j++){
+	
 		cur_diff= bands[i][j]-maxsBuffer[j];
-		if(cur_diff>0){diffs[i-onlinestep] +=cur_diff ; }
+		if(cur_diff>0.0){diffs[i-onlinestep] +=cur_diff ; }
+
 		
 	}
+
 
 }
 return;
@@ -151,6 +154,7 @@ AlgorithmStatus SuperFluxNovelty::process() {
       // or that the output buffer is full, in which cases we need to return from here
       return status;
     }
+    
 
     _algo->input("bands").set(_bands.tokens());
     _algo->output("Differences").set(_diffs.tokens());

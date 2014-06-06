@@ -62,6 +62,7 @@ class Triangularbands : public Algorithm {
   Real _sampleRate;
 
 
+
 };
 
 } // namespace standard
