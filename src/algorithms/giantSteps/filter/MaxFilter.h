@@ -52,7 +52,7 @@ class MaxFilter : public Algorithm {
   }
 
   void declareParameters() {
-    declareParameter("width", "window size for max filter :if centered, has to be odd ", "[3,inf)", 3);
+    declareParameter("width", "window size for max filter :if centered, has to be odd ", "[2,inf)", 3);
     declareParameter("Causal", "if the filter is causal: windows is behind current element else windows is centered around ", "{true,false}", true);
    // declareParameter("startFromZero", "suppress first frames width", "{true,false}", true);
 
