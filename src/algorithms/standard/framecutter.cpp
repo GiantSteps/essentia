@@ -208,6 +208,7 @@ void FrameCutter::configure() {
                             "is centered on the beginning of the audio)");
   }
   _validFrameThreshold = (int)round(ratio*_frameSize);
+ 
   // Adding noise to avoid divisions by zero (in case the user chooses to do so
   // by setting the silentFrames parameter to ADD_NOISE).  The level of such noise
   // is chosen to be -100dB because it will still be detected as a silent frame
@@ -252,13 +253,14 @@ void FrameCutter::configure() {
 AlgorithmStatus FrameCutter::process() {
   bool lastFrame = false;
 
-  EXEC_DEBUG("process()");
+  EXEC_DEBUG("processouz()");
 
   // if _streamIndex < _startIndex, we need to advance into the stream until we
   // arrive at _startIndex
   if (_streamIndex < _startIndex) {
     // to make sure we can skip that many, use frameSize (buffer has been resized
     // to be able to accomodate at least that many sample before starting processing)
+    EXEC_DEBUG("avance in stream");
     int skipSize = _frameSize;
     int howmuch = min(_startIndex - _streamIndex, skipSize);
     _audio.setAcquireSize(howmuch);
@@ -266,11 +268,15 @@ AlgorithmStatus FrameCutter::process() {
     _frames.setAcquireSize(0);
     _frames.setReleaseSize(0);
 
-    if (acquireData() != OK) return NO_INPUT;
+    if (acquireData() != OK){
+    EXEC_DEBUG("cant acquire" << howmuch);
+    return NO_INPUT;
+    
+    }
 
     releaseData();
     _streamIndex += howmuch;
-
+		
     return OK;
   }
 
@@ -282,7 +288,10 @@ AlgorithmStatus FrameCutter::process() {
 
   // we need this check anyway because we might be at the very end of the stream and try to acquire 0
   // for our last frame, which will unfortunately work, so just get rid of this case right now
-  if (available == 0) return NO_INPUT;
+  if (available == 0) {
+  EXEC_DEBUG("no tokens available");
+  return NO_INPUT;
+  }
 
   if (_startIndex < 0) {
     // left zero-padding and only acquire  as much as _frameSize + startIndex tokens and should release zero
@@ -293,6 +302,7 @@ AlgorithmStatus FrameCutter::process() {
 
   // if there are not enough tokens in the stream (howmuch < available):
   if (acquireSize >= available) { // has to be >= in case the size of the audio fits exactly with frameSize & hopSize
+    EXEC_DEBUG("no enough tokens available");
     if (!shouldStop()) return NO_INPUT; // not end of stream -> return and wait for more data to come
 
     acquireSize = available; // need to acquire what's left
@@ -329,10 +339,7 @@ AlgorithmStatus FrameCutter::process() {
 
   if (status != OK) {
     if (status == NO_INPUT) return NO_INPUT;
-    if (status == NO_OUTPUT) {
-      E_WARNING("No more output for FrameCutter. Scheduler needs to do something or we're toast...");
-      return NO_OUTPUT;
-    }
+    if (status == NO_OUTPUT) return NO_OUTPUT;
     throw EssentiaException("FrameCutter: something weird happened.");
   }
 

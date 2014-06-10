@@ -18,9 +18,9 @@
  */
 
 #include <iostream>
-#include "algorithmfactory.h"
-#include "poolstorage.h"
-#include "network.h"
+#include <essentia/algorithmfactory.h>
+#include <essentia/streaming/algorithms/poolstorage.h>
+#include <essentia/scheduler/network.h>
 using namespace std;
 using namespace essentia;
 using namespace essentia::streaming;
@@ -43,37 +43,34 @@ int main(int argc, char* argv[]) {
 
   streaming::AlgorithmFactory& factory = streaming::AlgorithmFactory::instance();
 
-  Algorithm* audioloader = factory.create("AudioLoader",
-                                                   "filename", audioFilename);
+  Algorithm* monoloader = factory.create("MonoLoader",
+                                         "filename", audioFilename,
+                                         "sampleRate", 44100.);
+ // using 'multifeature' method for best accuracy, 
+ // but it requires the largest computation time
+  Algorithm* rhythmextractor = factory.create("RhythmExtractor2013",
+                                              "method", "multifeature");
 
-  Algorithm* mono  = factory.create("MonoMixer");
-
-  Algorithm* rhythmextractor = factory.create("RhythmExtractor2013");
-  rhythmextractor->configure("method", "multifeature");  // best accuracy, but the largest computation time
 
   /////////// CONNECTING THE ALGORITHMS ////////////////
   cout << "-------- connecting algos --------" << endl;
 
-  // audioloader -> mono
-  connect(audioloader->output("audio"),      mono->input("audio"));
-  connect(audioloader->output("numberChannels"),   mono->input("numberChannels"));
-  connect(audioloader->output("sampleRate"), pool, "metadata.sampleRate");
+  monoloader->output("audio")             >> rhythmextractor->input("signal");
+  rhythmextractor->output("ticks")        >> PC(pool, "rhythm.ticks");
+  rhythmextractor->output("confidence")   >> PC(pool, "rhythm.ticks_confidence");
+  rhythmextractor->output("bpm")          >> PC(pool, "rhythm.bpm");
+  rhythmextractor->output("estimates")    >> PC(pool, "rhythm.estimates");
+  rhythmextractor->output("bpmIntervals") >> PC(pool, "rhythm.bpmIntervals");
+  // FIXME we need better rubato estimation algorithm
+  //connect(rhythmextractor->output("rubatoStart"), pool, "rhythm.rubatoStart");
+  //connect(rhythmextractor->output("rubatoStop"), pool, "rhythm.rubatoStop");
+  //connect(rhythmextractor->output("rubatoNumber"), pool, "rhythm.rubatoNumber");
 
-  // mono -> rhythmextractor
-  connect(mono->output("audio"), rhythmextractor->input("signal"));
-
-  connect(rhythmextractor->output("ticks"), pool, "rhythm.ticks");
-  connect(rhythmextractor->output("bpm"), pool, "rhythm.bpm");
-  connect(rhythmextractor->output("estimates"), pool, "rhythm.estimates");
-  connect(rhythmextractor->output("rubatoStart"), pool, "rhythm.rubatoStart");
-  connect(rhythmextractor->output("rubatoStop"), pool, "rhythm.rubatoStop");
-  connect(rhythmextractor->output("rubatoNumber"), pool, "rhythm.rubatoNumber");
-  connect(rhythmextractor->output("bpmIntervals"), pool, "rhythm.bpmIntervals");
 
   /////////// STARTING THE ALGORITHMS //////////////////
   cout << "-------- start processing " << audioFilename << " --------" << endl;
 
-  Network network(audioloader);
+  Network network(monoloader);
   network.run();
 
 
@@ -81,16 +78,17 @@ int main(int argc, char* argv[]) {
   cout << "-------- results --------" << endl;
   cout << "bpm: " << pool.value<Real>("rhythm.bpm") << endl;
   cout << "ticks: " << pool.value<vector<Real> >("rhythm.ticks") << endl;
+  cout << "ticks detection confidence: " << pool.value<Real>("rhythm.ticks_confidence") << endl; 
   cout << "estimates: " << pool.value<vector<Real> >("rhythm.estimates") << endl;
   cout << "bpmIntervals: " << pool.value<vector<Real> >("rhythm.bpmIntervals") << endl;
-  cout << "rubatoNumber:" << (int) pool.value<Real>("rhythm.rubatoNumber") << endl;
-  try {
-      cout << "rubatoStart: " << pool.value<vector<Real> >("rhythm.rubatoStart") << endl;
-      cout << "rubatoStop: " << pool.value<vector<Real> >("rhythm.rubatoStop") << endl;
-  }
-  catch (EssentiaException&) {
-    cout << "No rubato regions found" << endl;
-  }
+  //cout << "rubatoNumber:" << (int) pool.value<Real>("rhythm.rubatoNumber") << endl;
+  //try {
+  //    cout << "rubatoStart: " << pool.value<vector<Real> >("rhythm.rubatoStart") << endl;
+  //    cout << "rubatoStop: " << pool.value<vector<Real> >("rhythm.rubatoStop") << endl;
+  //}
+  //catch (EssentiaException&) {
+  //  cout << "No rubato regions found" << endl;
+  //}
 
   essentia::shutdown();
 

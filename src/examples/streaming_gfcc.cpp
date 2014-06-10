@@ -19,9 +19,9 @@
 
 #include <iostream>
 #include <fstream>
-#include "algorithmfactory.h"
-#include "poolstorage.h"
-#include "network.h"
+#include <essentia/algorithmfactory.h>
+#include <essentia/streaming/algorithms/poolstorage.h>
+#include <essentia/scheduler/network.h>
 using namespace std;
 using namespace essentia;
 using namespace streaming;
@@ -78,9 +78,8 @@ int main(int argc, char* argv[]) {
 
   // Spectrum -> MFCC -> Pool
   connect(spec->output("spectrum"), gfcc->input("spectrum"));
-  connect(gfcc->output("bands"), pool, "lowlevel.gfcc_bands");
+  connect(gfcc->output("bands"), pool, "lowlevel.erbbands");
   connect(gfcc->output("gfcc"), pool, "lowlevel.gfcc");
-  //connect(gfcc->output("gfcc"), NOWHERE);
 
 
 

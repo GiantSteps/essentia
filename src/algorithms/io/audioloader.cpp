@@ -34,15 +34,15 @@ const char* AudioLoader::description = DOC("This algorithm loads the single audi
 "\n"
 "References:\n"
 "  [1] WAV - Wikipedia, the free encyclopedia,\n"
-"      http://en.wikipedia.org/wiki/Wav\n"
+"  http://en.wikipedia.org/wiki/Wav\n\n"
 "  [2] Audio Interchange File Format - Wikipedia, the free encyclopedia,\n"
-"      http://en.wikipedia.org/wiki/Aiff\n"
+"  http://en.wikipedia.org/wiki/Aiff\n\n"
 "  [3] Free Lossless Audio Codec - Wikipedia, the free encyclopedia,\n"
-"      http://en.wikipedia.org/wiki/Flac\n"
+"  http://en.wikipedia.org/wiki/Flac\n\n"
 "  [4] Vorbis - Wikipedia, the free encyclopedia,\n"
-"      http://en.wikipedia.org/wiki/Vorbis\n"
+"  http://en.wikipedia.org/wiki/Vorbis\n\n"
 "  [5] MP3 - Wikipedia, the free encyclopedia,\n"
-"      http://en.wikipedia.org/wiki/Mp3");
+"  http://en.wikipedia.org/wiki/Mp3");
 
 
 AudioLoader::~AudioLoader() {
@@ -82,10 +82,14 @@ void AudioLoader::openAudioFile(const string& filename) {
     }
 
     // Retrieve stream information
-    if (avformat_find_stream_info(_demuxCtx, NULL) < 0) {
+    int errnum;
+    if ((errnum = avformat_find_stream_info(_demuxCtx, NULL)) < 0) {
+        char errorstr[128];
+        string error = "Unknown error";
+        if (av_strerror(errnum, errorstr, 128) == 0) error = errorstr;
         avformat_close_input(&_demuxCtx);
         _demuxCtx = 0;
-        throw EssentiaException("AudioLoader: Could not find stream information");
+        throw EssentiaException("AudioLoader: Could not find stream information, error = ", error);
     }
 
     // Dump information about file onto standard error
@@ -393,12 +397,12 @@ int AudioLoader::decodePacket() {
         int istride[6]      = { av_get_bytes_per_sample(_audioCtx->sample_fmt) };
         int ostride[6]      = { av_get_bytes_per_sample(AV_SAMPLE_FMT_S16)     };
         int totalsamples    = _dataSize / istride[0]; // == num_samp_per_channel * num_channels
-  
+
         if (av_audio_convert(_audioConvert, obuf, ostride, ibuf, istride, totalsamples) < 0) {
             ostringstream msg;
             msg << "AudioLoader: Error converting "
-                << " from " << avcodec_get_sample_fmt_name(_audioCtx->sample_fmt)
-                << " to "   << avcodec_get_sample_fmt_name(SAMPLE_FMT_S16);
+                << " from " << av_get_sample_fmt_name(_audioCtx->sample_fmt)
+                << " to "   << av_get_sample_fmt_name(AV_SAMPLE_FMT_S16);
             throw EssentiaException(msg);
         }
 
@@ -406,19 +410,19 @@ int AudioLoader::decodePacket() {
         // that the audio was taking in its native format. Now it needs to be set
         // to the size of the audio we're returning, after conversion
         _dataSize = totalsamples * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
-        memcpy(_buffer, _buff2, _dataSize); 
+        memcpy(_buffer, _buff2, _dataSize);
     }
 #endif
 
     if (len != _packet.size) {
-        // FIXME: the following doesn't seem to happen anymore, probably some old
-        //        workaround for ffmpeg. Complain loudly if something looks fishy
+        // FIXME: investigate why this happens and whether it is a big issue
+        //        (looks like it only loses silent samples at the end of files)
 
         // more than 1 frame in a packet, happens a lot with flac for instance...
-        const char msg[] = "AudioLoader: more than 1 frame in packet, not supported anymore... "
-            "Please report the issue with the file that caused it.";
-        E_ERROR(msg);
-        throw EssentiaException(msg);
+        E_WARNING("AudioLoader: more than 1 frame in packet, dropping remaining bytes...");
+        E_WARNING("at sample index: " << output("audio").totalProduced());
+        E_WARNING("decoded samples: " << len);
+        E_WARNING("packet size: " << _packet.size);
     }
 
     return len;

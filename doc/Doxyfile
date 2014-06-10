@@ -32,7 +32,7 @@ PROJECT_NAME           = "Essentia"
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER  = 2.0-dev
+PROJECT_NUMBER  = 2.0.1
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer
@@ -655,9 +655,10 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = src/base \
-                         src/streaming \
-                         src/scheduler \
+INPUT                  = src/essentia \
+                         src/essentia/streaming \
+                         src/essentia/scheduler \
+                         src/essentia/utils \
                          doc/doxygendoc
 
 # This tag can be used to specify the character encoding of the source files

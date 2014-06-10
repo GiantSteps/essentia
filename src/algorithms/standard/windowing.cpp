@@ -33,17 +33,21 @@ const char* Windowing::description = DOC("This algorithm applies windowing to au
 "An exception is thrown if the size of the frame is less than 2.\n"
 "\n"
 "References:\n"
-"  [1] F. J. Harris, On the use of windows for harmonic analysis with the discrete Fourier transform,\n"
-"      Proceedings of the IEEE, vol. 66, no. 1, pp. 51-83, Jan. 1978\n"
+"  [1] F. J. Harris, \"On the use of windows for harmonic analysis with the\n"
+"  discrete Fourier transform, Proceedings of the IEEE, vol. 66, no. 1,\n"
+"  pp. 51-83, Jan. 1978\n\n"
 "  [2] Window function - Wikipedia, the free encyclopedia,\n"
-"      http://en.wikipedia.org/wiki/Window_function");
+"  http://en.wikipedia.org/wiki/Window_function");
 
 void Windowing::configure() {
   _window.resize(parameter("size").toInt());
-  createWindow(parameter("type").toLower());
+
 
   _zeroPadding = parameter("zeroPadding").toInt();
   _zeroPhase = parameter("zeroPhase").toBool();
+  _Normalize = parameter("Normalize").toBool();
+
+createWindow(parameter("type").toLower());
 }
 
 void Windowing::createWindow(const std::string& windowtype) {
@@ -56,7 +60,7 @@ void Windowing::createWindow(const std::string& windowtype) {
   else if (windowtype == "blackmanharris74") blackmanHarris74();
   else if (windowtype == "blackmanharris92") blackmanHarris92();
 
-  normalize();
+ if(_Normalize){ normalize();}
 }
 
 void Windowing::compute() {
@@ -69,6 +73,8 @@ void Windowing::compute() {
 
   if (signal.size() != _window.size()) {
     _window.resize(signal.size());
+    
+    E_DEBUG( EAlgorithm, "signal different than window size" << signal.size());
     createWindow(parameter("type").toLower());
   }
 
@@ -125,6 +131,7 @@ void Windowing::hann() {
 
   for (int i=0; i<size; i++) {
     _window[i] = 0.5 - 0.5 * cos((2.0*M_PI*i) / (size - 1.0));
+    
   }
 }
 
@@ -183,6 +190,7 @@ void Windowing::blackmanHarris92() {
 
 
 void Windowing::normalize() {
+//cout << "fdsgsjflfdksjfdslfkjdfslkj" << _Normalize <<endl;
   const int size = _window.size();
   Real sum = 0.0;
   for (int i=0; i<size; i++) {

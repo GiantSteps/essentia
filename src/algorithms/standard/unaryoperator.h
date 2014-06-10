@@ -38,7 +38,8 @@ class UnaryOperator : public Algorithm {
     SIN,
     COS,
     SQRT,
-    SQUARE
+    SQUARE,
+    CUBE
   };
 
   OpType typeFromString(const std::string& name) const;
@@ -55,7 +56,7 @@ class UnaryOperator : public Algorithm {
   }
 
   void declareParameters() {
-    declareParameter("type", "the type of the unary operator to apply to input array", "{identity,abs,log10,log,ln,lin2db,db2lin,sin,cos,sqrt,square}", "identity");
+    declareParameter("type", "the type of the unary operator to apply to input array", "{identity,abs,log10,log,ln,lin2db,db2lin,sin,cos,sqrt,square,cube}", "identity");
   }
 
   void configure() {

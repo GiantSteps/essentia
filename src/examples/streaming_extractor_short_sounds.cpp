@@ -19,11 +19,11 @@
 
 #include <iostream>
 #include <sstream>
-#include "algorithmfactory.h"
-#include "essentiamath.h"
-#include "poolstorage.h"
-#include "essentiautil.h"
-#include "network.h"
+#include <essentia/algorithmfactory.h>
+#include <essentia/essentiamath.h>
+#include <essentia/streaming/algorithms/poolstorage.h>
+#include <essentia/essentiautil.h>
+#include <essentia/scheduler/network.h>
 
 // helper functions
 #include "streaming_extractorutils.h"
@@ -354,13 +354,13 @@ void computeLowLevel(const string& audioFilename, Real startTime, Real endTime, 
   connect(rhythmExtractor->output("ticks"), pool, rhythmspace + "beats_position");
   connect(rhythmExtractor->output("bpm"), pool, rhythmspace + "bpm");
   connect(rhythmExtractor->output("estimates"), pool, rhythmspace + "bpm_estimates");
-  connect(rhythmExtractor->output("rubatoStart"), pool, rhythmspace + "rubato_start");
-  connect(rhythmExtractor->output("rubatoStop"), pool, rhythmspace + "rubato_stop");
-  connect(rhythmExtractor->output("rubatoNumber"), pool, rhythmspace + "rubato_sections_number");
+  //connect(rhythmExtractor->output("rubatoStart"), pool, rhythmspace + "rubato_start");
+  //connect(rhythmExtractor->output("rubatoStop"), pool, rhythmspace + "rubato_stop");
+  //connect(rhythmExtractor->output("rubatoNumber"), pool, rhythmspace + "rubato_sections_number");
   connect(rhythmExtractor->output("bpmIntervals"), pool, rhythmspace + "bpm_intervals");
 
   // BPM Histogram descriptors
-  Algorithm* bpmhist = factory.create("BPMHistogramDescriptors");
+  Algorithm* bpmhist = factory.create("BpmHistogramDescriptors");
   connect(rhythmExtractor->output("bpmIntervals"), bpmhist->input("bpmIntervals"));
   connect(bpmhist->output("firstPeakBPM"), pool, rhythmspace + "first_peak_bpm");
   connect(bpmhist->output("firstPeakWeight"), pool, rhythmspace + "first_peak_weight");

@@ -25,17 +25,18 @@ using namespace essentia;
 using namespace standard;
 
 const char* Dissonance::name = "Dissonance";
-const char* Dissonance::description = DOC("This algorithm calculates the sensory dissonance (to distinguish from musical or theoretical dissonance) of an audio signal given its spectral peaks. Sensory dissonance is based on the roughness of the spectral peaks."
+const char* Dissonance::description = DOC("This algorithm calculates the sensory dissonance (to distinguish from musical or theoretical dissonance) of an audio signal given its spectral peaks. Sensory dissonance measures perceptual roughness of the sound and is based on the roughness of its spectral peaks. Given the spectral peaks, the algorithm estimates total dissonance by summing up the normalized dissonance values for each pair of peaks. These values are computed using dissonance curves, which define dissonace between two spectral peaks according to their frequency and amplitude relations. The dissonance curves are based on perceptual experiments conducted in [1]."
 "\n"
 "Exceptions are thrown when the size of the input vectors are not equal or if input frequencies are not ordered ascendantly"
 "\n"
 "References:\n"
-"  [1] R. Plomp, W. J. M. Levelt, Tonal Consonance and Critical Bandwidth\n"
-"      J. Acoust. Soc. Am. 38, 548-560, 1965"
+"  [1] R. Plomp and W. J. M. Levelt, \"Tonal Consonance and Critical\n"
+"  Bandwidth,\" The Journal of the Acoustical Society of America, vol. 38,\n"
+"  no. 4, pp. 548–560, 1965.\n\n"
 "  [2] Critical Band - Handbook for Acoustic Ecology\n"
-"      http://www.sfu.ca/sonic-studio/handbook/Critical_Band.html\n"
+"  http://www.sfu.ca/sonic-studio/handbook/Critical_Band.html\n\n"
 "  [3] Bark Scale -  Wikipedia, the free encyclopedia,\n"
-"      http://en.wikipedia.org/wiki/Bark_scale");
+"  http://en.wikipedia.org/wiki/Bark_scale");
 
 Real aWeighting(Real f) {
   // from http://www.cross-spectrum.com/audio/weighting.html

@@ -23,6 +23,7 @@
 #include "algorithm.h"
 #include "splineutil.h"
 
+
 namespace essentia {
 namespace standard {
 

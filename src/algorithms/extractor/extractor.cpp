@@ -32,7 +32,7 @@ using streaming::connect;
 using streaming::VectorInput;
 
 const char* Extractor::name = "Extractor";
-const char* Extractor::description = DOC("This algorithm extracts all low level, mid level and high level features from an audio signal and stores them in a pool. Note that this algorithm cannot be used as efficiently as its counterparts extractors by themselves and therefore running it on full audio signals is discouraged.");
+const char* Extractor::description = DOC("This algorithm extracts all low level, mid level and high level features from an audio signal and stores them in a pool.");
 
 void Extractor::configure() {
   _lowLevelFrameSize = parameter("lowLevelFrameSize").toInt();
@@ -172,7 +172,7 @@ void Extractor::computeMidLevel(const vector<Real>& signal, Pool& pool) {
                                           "beats", ticks);
     connect(*gen, beatsLoudness->input("signal"));
     connect(beatsLoudness->output("loudness"), pool, _rhythmspace + "beats_loudness");
-    connect(beatsLoudness->output("loudnessBass"), pool, _rhythmspace + "beats_loudness_bass");
+    connect(beatsLoudness->output("loudnessBandRatio"), pool, _rhythmspace + "beats_loudness_band_ratio");
   }
 
   scheduler::Network network(gen);

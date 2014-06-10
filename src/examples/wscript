@@ -57,16 +57,15 @@ def build(ctx):
 
             ctx.program(source = ctx.path.ant_glob(' '.join(files)),
                         target = '%s_%s' % (prefix, prog_name),
-                        includes = [ '.' ] + adjust(ctx.env.INCLUDES, '..'),
+                        includes = [ '.', '..' ],
                         use      = 'essentia ' + ctx.env.USES,
                         install_path = None)
 
 
         build_example('standard', 'beatsmarker')
-        build_example('standard', 'rhythmextractor_tempotap')
         build_example('standard', 'mfcc')
         build_example('standard', 'onsetrate')
-        build_example('standard', 'extractorpitch')
+        build_example('standard', 'pitchyinfft')
         build_example('standard', 'fadedetection')
         build_example('standard', 'spectralcontrast')
         build_example('standard', 'rhythmtransform')
@@ -89,44 +88,61 @@ def build(ctx):
                                    'extractorpanning',
                                    'extractorpostprocess' ])
 
-        build_example('streaming', 'schizo_extractor',
+        # OUTDATED:
+        #build_example('streaming', 'schizo_extractor',
+        #                         [ 'extractorutils',
+        #                           'extractormetadata',
+        #                           'extractortonal',
+        #                           'extractorlowlevel',
+        #                           'extractorsfx',
+        #                           'extractorpanning',
+        #                           'extractorpostprocess' ])
+
+        #build_example('streaming', 'extractor_canoris',
+        #                         [ 'extractorutils',
+        #                           'extractortonal',
+        #                           'extractorlowlevel',
+        #                           'extractorsfx',
+        #                           'extractorpanning',
+        #                           'extractorpostprocess' ])
+
+        build_example('streaming', 'extractor_archivemusic',
                                  [ 'extractorutils',
-                                   'extractormetadata',
-                                   'extractortonal',
-                                   'extractorlowlevel',
+                                   'extractor_archivemusic_tonal',
+                                   'extractor_archivemusic_lowlevel',
                                    'extractorsfx',
                                    'extractorpanning',
-                                   'extractorpostprocess' ])
+                                   'extractor_archivemusic_postprocess' ])
 
-        build_example('streaming', 'extractor_canoris',
-                                 [ 'extractorutils',
-                                   'extractortonal',
-                                   'extractorlowlevel',
-                                   'extractorsfx',
-                                   'extractorpanning',
-                                   'extractorpostprocess' ])
-
-        build_example('streaming', 'extractor_archive',
-                                 [ 'extractorutils',
-                                   'extractor_archivetonal',
-                                   'extractor_archivelowlevel',
-                                   'extractorsfx',
-                                   'extractorpanning',
-                                   'extractor_archivepostprocess' ])
-
-        build_example('streaming', 'rhythmextractor_noveltycurve')
         build_example('streaming', 'beatsmarker')
         build_example('streaming', 'mfcc')
         build_example('streaming', 'gfcc')
         build_example('streaming', 'rhythmextractor_multifeature')
-        build_example('streaming', 'beattracker_multifeature')
+        build_example('streaming', 'beattracker_multifeature_mirex2013')
         build_example('streaming', 'onsetrate')
         build_example('streaming', 'panning')
         build_example('streaming', 'tuningfrequency')
-        build_example('streaming', 'extractorkey')
-        build_example('streaming', 'extractorpitch')
-        build_example('streaming', 'extractorpredominantmelody')
+        build_example('streaming', 'key')
+        build_example('streaming', 'pitchyinfft')
+        build_example('streaming', 'predominantmelody')
+        
+        freesound_files = [ 'streaming_extractor_freesound.cpp',
+			     'freesound/FreesoundExtractor.cpp',
+			     'freesound/FreesoundLowlevelDescriptors.cpp',
+			     'freesound/FreesoundRhythmDescriptors.cpp',
+			     'freesound/FreesoundTonalDescriptors.cpp',
+			     'freesound/FreesoundSfxDescriptors.cpp'
+	    ]
 
+        ctx.program(source = ctx.path.ant_glob(' '.join(freesound_files)),
+                        target = 'streaming_extractor_freesound',
+                        includes = [ '.', '..' ,'../..'],
+                        use      = 'essentia ' + ctx.env.USES,
+                        install_path = None)
+
+        # copy svm models to build folder if gaia2 is installed and svm_models folder exists
+        if ctx.env.USES.count('GAIA2'):
+            ctx.install_files('build/src/examples/', ctx.path.ant_glob('svm_models/*'), relative_trick=True)
 
 
     if ctx.env.WITH_VAMP:
@@ -144,7 +160,7 @@ def build(ctx):
         vamp = ctx.shlib(
             source   = ctx.path.ant_glob('vamp*.cpp') + vamp_sdk_files,
             target   = 'vamp_essentia',
-            includes = [ '.' ] + adjust(ctx.env.INCLUDES, '..'),
+            includes = [ '.', '..', '../3rdparty/vamp-plugin-sdk-2.4' ],
             use      = 'essentia ' + ctx.env.USES,
             install_path = install_path
         )

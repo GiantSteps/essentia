@@ -34,10 +34,22 @@ const char* BeatTrackerMultiFeature::description = DOC("This algorithm estimates
 "  - beat emphasis function (see 'beat_emphasis' method in OnsetDetectionGlobal algorithm, 2048/512)\n"
 "  - spectral flux between histogrammed spectrum frames, measured by the modified information gain (see 'infogain' method in OnsetDetectionGlobal algorithm, 2048/512)\n"
 "\n"
+"You can follow these guidelines [2] to assess the quality of beats estimation based on the computed confidence value:\n"
+"  - [0, 1)      very low confidence, the input signal is hard for the employed candidate beat trackers\n"
+"  - [1, 1.5]    low confidence\n"
+"  - (1.5, 3.5]  good confidence, accuracy around 80% in AMLt measure\n"
+"  - (3.5, 5.32] excellent confidence\n"
+"\n"
 "Note that the algorithm requires the audio input with the 44100 Hz sampling rate in order to function correctly.\n"
 "\n"
 "References:\n"
-"  [1] J. Zapata (MTG). Submitted article to IEEE TSALP, 2013. TODO. \n");
+"  [1] J. Zapata, M. Davies and E. Gómez, \"Multi-feature beat tracker,\"\n"
+"  IEEE/ACM Transactions on Audio, Speech and Language Processing. 22(4),\n"
+"  816-825, 2014\n\n"
+"  [2] J.R. Zapata, A. Holzapfel, M.E.P. Davies, J.L. Oliveira, F. Gouyon,\n"
+"  \"Assigning a confidence threshold on automatic beat annotation in large\n"
+"  datasets\", International Society for Music Information Retrieval Conference\n"
+"  (ISMIR'12), pp. 157-162, 2012\n");
 
 
 BeatTrackerMultiFeature::BeatTrackerMultiFeature() : AlgorithmComposite(),
@@ -48,13 +60,11 @@ BeatTrackerMultiFeature::BeatTrackerMultiFeature() : AlgorithmComposite(),
 
   declareInput(_signal, 1024, "signal", "input signal");
   declareOutput(_ticks, 0, "ticks", "the estimated tick locations [s]");
+  declareOutput(_confidence, "confidence", "confidence of the beat tracker [0, 5.32]");
 
-  // NB: We want to have the same output stream type as in TempoTapTicks for
-  // consistency. We need to increase buffer size of the output because the
-  // algorithm works on the level of entire track and we need to push all values
-  // in the output source at once.
-  _ticks.setBufferType(BufferUsage::forLargeAudioStream);
-
+  // Need to set the buffer type to multiple frames as all the ticks
+  // are output all at once
+  _ticks.setBufferType(BufferUsage::forMultipleFrames);
 }
 
 void BeatTrackerMultiFeature::createInnerNetwork() {
@@ -215,21 +225,37 @@ AlgorithmStatus BeatTrackerMultiFeature::process() {
 
   vector<vector<Real> > tickCandidates;
   vector<Real> ticks;
+  Real confidence;
 
   tickCandidates.resize(5);
-  tickCandidates[0] = _pool.value<vector<Real> >("internal.ticksComplex");
-  tickCandidates[1] = _pool.value<vector<Real> >("internal.ticksRms");
-  tickCandidates[2] = _pool.value<vector<Real> >("internal.ticksMelFlux");
-  tickCandidates[3] = _pool.value<vector<Real> >("internal.ticksBeatEmphasis");
-  tickCandidates[4] = _pool.value<vector<Real> >("internal.ticksInfogain");
+
+  // ticks candidates might be empty for very short signals, but
+  // it is ok to feed empty tick vetors to TempoTapMaxAgreement
+  if (_pool.contains<vector<Real> >("internal.ticksComplex")) {
+    tickCandidates[0] = _pool.value<vector<Real> >("internal.ticksComplex");
+  }
+  if (_pool.contains<vector<Real> >("internal.ticksRms")) {
+    tickCandidates[1] = _pool.value<vector<Real> >("internal.ticksRms");
+  }
+  if (_pool.contains<vector<Real> >("internal.ticksMelFlux")) {
+    tickCandidates[2] = _pool.value<vector<Real> >("internal.ticksMelFlux");
+  }
+  if (_pool.contains<vector<Real> >("internal.ticksBeatEmphasis")) {
+    tickCandidates[3] = _pool.value<vector<Real> >("internal.ticksBeatEmphasis");
+  }
+  if (_pool.contains<vector<Real> >("internal.ticksInfogain")) {
+    tickCandidates[4] = _pool.value<vector<Real> >("internal.ticksInfogain");
+  }
 
   _tempoTapMaxAgreement->input("tickCandidates").set(tickCandidates);
   _tempoTapMaxAgreement->output("ticks").set(ticks);
+  _tempoTapMaxAgreement->output("confidence").set(confidence);
   _tempoTapMaxAgreement->compute();
 
   for (size_t i=0; i<ticks.size(); ++i) {
     _ticks.push(ticks[i]);
   }
+  _confidence.push(confidence);
   return FINISHED;
 }
 
@@ -255,15 +281,28 @@ const char* BeatTrackerMultiFeature::description = DOC("This algorithm estimates
 "  - beat emphasis function (see 'beat_emphasis' method in OnsetDetectionGlobal algorithm, 2048/512)\n"
 "  - spectral flux between histogrammed spectrum frames, measured by the modified information gain (see 'infogain' method in OnsetDetectionGlobal algorithm, 2048/512)\n"
 "\n"
+"You can follow these guidelines [2] to assess the quality of beats estimation based on the computed confidence value:\n"
+"  - [0, 1)      very low confidence, the input signal is hard for the employed candidate beat trackers\n"
+"  - [1, 1.5]    low confidence\n"
+"  - (1.5, 3.5]  good confidence, accuracy around 80% in AMLt measure\n"
+"  - (3.5, 5.32] excellent confidence\n"
+"\n"
 "Note that the algorithm requires the audio input with the 44100 Hz sampling rate in order to function correctly.\n"
 "\n"
 "References:\n"
-"  [1] J. Zapata (MTG). Submitted article to IEEE TSALP, 2013. TODO. \n");
+"  [1] J. Zapata, M. Davies and E. Gómez, \"Multi-feature beat tracker,\"\n"
+"  IEEE/ACM Transactions on Audio, Speech and Language Processing. 22(4),\n"
+"  816-825, 2014\n\n"
+"  [2] J.R. Zapata, A. Holzapfel, M.E.P. Davies, J.L. Oliveira, F. Gouyon,\n"
+"  \"Assigning a confidence threshold on automatic beat annotation in large\n"
+"  datasets\", International Society for Music Information Retrieval Conference\n"
+"  (ISMIR'12), pp. 157-162, 2012\n");
 
 
 BeatTrackerMultiFeature::BeatTrackerMultiFeature() {
   declareInput(_signal, "signal", "the audio input signal");
   declareOutput(_ticks, "ticks", " the estimated tick locations [s]");
+  declareOutput(_confidence, "confidence", "confidence of the beat tracker [0, 5.32]");
 
   createInnerNetwork();
 }
@@ -285,6 +324,7 @@ void BeatTrackerMultiFeature::createInnerNetwork() {
 
   *_vectorInput  >>  _beatTracker->input("signal");
   _beatTracker->output("ticks")  >>  PC(_pool, "internal.ticks");
+  _beatTracker->output("confidence") >> PC(_pool, "internal.confidence");
 
   _network = new scheduler::Network(_vectorInput);
 }
@@ -294,21 +334,25 @@ void BeatTrackerMultiFeature::compute() {
   // which could be fixed by manually reseting here after computations are done
   const vector<Real>& signal = _signal.get();
   vector<Real>& ticks = _ticks.get();
+  Real& confidence = _confidence.get();
 
   _vectorInput->setVector(&signal);
   _network->run();
   try {
     ticks = _pool.value<vector<Real> >("internal.ticks");
+    confidence = _pool.value<Real> ("internal.confidence");
   }
   catch (EssentiaException&) {
     // no ticks were found because audio signal was too short
     ticks.clear();
+    confidence = 0.;
   }
 }
 
 void BeatTrackerMultiFeature::reset() {
   _network->reset();
   _pool.remove("internal.ticks");
+  _pool.remove("internal.confidence");
 }
 
 } // namespace standard

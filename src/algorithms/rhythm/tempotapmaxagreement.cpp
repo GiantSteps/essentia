@@ -12,13 +12,19 @@ using namespace essentia;
 using namespace standard;
 
 const char* TempoTapMaxAgreement::name = "TempoTapMaxAgreement";
-const char* TempoTapMaxAgreement::description = DOC("This algorithm estimates beat positions based on the maximum mutual agreement between given beat postion candidates, estimated by different beat trackers (or using different features) [1,2].\n"
+const char* TempoTapMaxAgreement::description = DOC("This algorithm estimates beat positions and confidence of their estimation based on the maximum mutual agreement between given beat postion candidates, estimated by different beat trackers (or using different features) [1,2].\n"
 "\n"
 "Note that the input tick times should be in ascending order and that they cannot contain negative values otherwise an exception will be thrown.\n"
 "\n"
 "References:\n"
-"  [1] Zapata, J. R., Holzapfel, A., Davies, M. E., Oliveira, J. L., & Gouyon, F. (2012). Assigning a Confidence Threshold on Automatic Beat Annotation in Large Datasets. In Proceedings of 13th International Society for Music Information Retrieval Conference (ISMIR 2012), Porto.\n"
-"  [2] Holzapfel, A., Davies, M. E., Zapata, J. R., Oliveira, J. L., & Gouyon, F. (2012). Selective sampling for beat tracking evaluation. Audio, Speech, and Language Processing, IEEE Transactions on, 20(9), 2539-2548.\n");
+"  [1] J. R. Zapata, A. Holzapfel, M. E. Davies, J. L. Oliveira, and\n"
+"  F. Gouyon, \"Assigning a confidence threshold on automatic beat annotation\n"
+"  in large datasets,\" in International Society for Music Information\n" 
+"  Retrieval Conference (ISMIR’12), 2012.\n\n"
+"  [2] A. Holzapfel, M. E. Davies, J. R. Zapata, J. L. Oliveira, and\n"
+"  F. Gouyon, \"Selective sampling for beat tracking evaluation,\" IEEE\n" 
+"  Transactions on Audio, Speech, and Language Processing, vol. 13, no. 9,\n"
+"  pp. 2539-2548, 2012.\n");
 
 
 void TempoTapMaxAgreement::configure() {
@@ -48,6 +54,7 @@ void TempoTapMaxAgreement::reset() {
 void TempoTapMaxAgreement::compute() {
   vector<vector<Real> > tickCandidates = _tickCandidates.get(); // we need a copy
   vector<Real>& ticks = _ticks.get();
+  Real& confidence = _confidence.get();
 
   // sanity checks
   for(int i=0; i<(int) tickCandidates.size(); ++i) {
@@ -75,7 +82,6 @@ void TempoTapMaxAgreement::compute() {
 
   int numberMethods = (int) tickCandidates.size();
   vector<vector<Real> > infogain(numberMethods, vector<Real> (numberMethods, 0.));
-  vector<vector<Real> > accuracy(numberMethods, vector<Real> (numberMethods, 0.));
 
   for (int i=0; i<numberMethods; ++i) {
     for (int j=i+1; j<numberMethods; ++j) {
@@ -104,6 +110,7 @@ void TempoTapMaxAgreement::compute() {
 
   int selectedMethod = argmax(distanceInfogain);
   ticks = _tickCandidates.get()[selectedMethod];
+  confidence = mean(distanceInfogain);
 }
 
 

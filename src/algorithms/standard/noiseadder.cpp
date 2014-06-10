@@ -28,13 +28,10 @@ const char* NoiseAdder::description = DOC("This algorithm adds some amount of no
 "\n"
 "References:\n"
 "  [1] Mersenne Twister: A random number generator (since 1997/10),\n"
-"      http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html\n"
+"  http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html\n\n"
 "  [2] Mersenne twister - Wikipedia, the free encyclopedia,\n"
-"      http://en.wikipedia.org/wiki/Mersenne_twister");
+"  http://en.wikipedia.org/wiki/Mersenne_twister");
 
-
-// The implementation uses the MersenneTwister.h file downloaded from:
-// http://www-personal.engin.umich.edu/~wagnerr/MersenneTwister.html
 
 void NoiseAdder::configure() {
   _level = db2pow(parameter("level").toReal());
@@ -52,7 +49,11 @@ void NoiseAdder::compute() {
   std::vector<Real>::size_type size = signal.size();
   noise.resize(size);
   for (std::vector<Real>::size_type i=0; i<size; i++) {
-    noise[i] = signal[i] + _level * ((Real)_mtrand()*2.0 - 1.0);
+#ifdef CPP_11
+    noise[i] = signal[i] + _level * (Real(_mtrand())/std::mt19937::max()*2.0f - 1.0f);
+#else
+    noise[i] = signal[i] + _level * (Real(_mtrand())*2.0f - 1.0f);
+#endif
   }
 
 }

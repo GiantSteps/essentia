@@ -23,6 +23,7 @@
 #include "algorithmfactory.h"
 #include "streamingalgorithmwrapper.h"
 
+using namespace std;
 namespace essentia {
 namespace standard {
 
@@ -80,6 +81,10 @@ class MovingAverage : public StreamingAlgorithmWrapper {
     declareOutput(_y, STREAM, preferredSize, "signal");
 
     _y.setBufferType(BufferUsage::forAudioStream);
+  }
+  
+  void configure(){
+  //cout<<"configuration mAvg"<<endl;
   }
 };
 

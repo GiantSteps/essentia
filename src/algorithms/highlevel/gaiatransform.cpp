@@ -28,13 +28,13 @@ using namespace standard;
 
 const char* GaiaTransform::name = "GaiaTransform";
 const char* GaiaTransform::description = DOC(
-"Applies a given Gaia2 transformation history to a given pool. It first converts "
-"the pool into a gaia2::Point suitable for the history, applies the history, and "
-"converts back the resulting point into an essentia Pool."
+"Applies a given Gaia2 transformation history to a given pool. It first converts the pool into a gaia2::Point suitable for the history, applies the history, and converts back the resulting point into an essentia Pool. In particular, it allows classification.\n"
+"\n"
+"Note that in order to enable this algorithm it is necessary to install Gaia2 library before building Essentia.\n"
 "\n"
 "References:\n"
 "  [1] Gaia - A library for similarity in high-dimensional spaces,\n"
-"      http://mtg.upf.edu/technologies/essentia");
+"  http://github.com/MTG/gaia");
 
 
 

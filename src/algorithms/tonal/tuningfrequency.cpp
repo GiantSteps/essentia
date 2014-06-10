@@ -29,9 +29,11 @@ const char* TuningFrequency::description = DOC("Given a sequence/set of spectral
 "\n"
 "Input vectors should have the same size, otherwise an exception is thrown. This algorithm should be given the outputs of the spectral peaks algorithm.\n"
 "\n"
+"Application: Western vs non-western music classification, key estimation, HPCP computation, tonal similarity."
+"\n"
 "References:\n"
-"  [1] E. Gómez, Key Estimation from Polyphonic Audio,\n"
-"      Music Technology Group, Pompeu Fabra University, 2005");
+"  [1] E. Gómez, \"Key estimation from polyphonic audio,\" in Music Information\n"
+"  Retrieval Evaluation Exchange (MIREX’05), 2005.");
 
 const Real TuningFrequency::wrappingBoundary = -35;
 

@@ -42,15 +42,19 @@ Installing dependencies on Mac OS X
 
 Install a scientific python environment first:
 
-1. install homebrew (package manager): http://mxcl.github.io/homebrew/
-2. install prerequisites: ``brew install pkg-config gfortran readline sqlite gdbm freetype libpng``
-3. install python: ``brew install python --framework``
-4. install ipython and numpy: ``pip install ipython numpy``
-5. install matplotlib: ``pip install matplotlib``
-6. when launching ipython, use:
+1. install Command Line Tools for Xcode: https://github.com/mxcl/homebrew/wiki/Installation
+2. install homebrew (package manager): http://brew.sh/
+3. install prerequisites: ``brew install pkg-config gfortran readline sqlite gdbm freetype libpng``
+4. install python: ``brew install python --framework``
+5. install ipython and numpy: ``pip install ipython numpy``
+6. install matplotlib: ``pip install matplotlib``
+7. when launching ipython, use:
 
   a. ``ipython --pylab``    if you have matplotlib >= 1.3
   b. ``ipython --pylab=tk`` if you have matplotlib < 1.3
+
+Note that you are advised to install python environment **as described here**, i.e., via homebrew and pip. You will most probably encounter installation errors when using
+python/numpy preinstalled with OSX 10.9.
 
 More details can be found at https://github.com/mxcl/homebrew/wiki/Homebrew-and-Python
 
@@ -64,7 +68,7 @@ Installing dependencies on Windows
 
 Essentia does compile and run correctly on Windows, however there is no Visual
 Studio project readily available, so you will have to setup one yourself and
-compile the dependencies too.
+compile the dependencies too. We will be working on Windows installer in the near future. 
 
 
 Additional dependencies (python, all platforms)
@@ -72,11 +76,15 @@ Additional dependencies (python, all platforms)
 
 To build the documentation you will also need the following dependencies::
 
-  pip install sphinx pyparsing==1.5.7 sphinxcontrib-doxylink
+  pip install sphinx pyparsing sphinxcontrib-doxylink docutils
 
 Other useful dependencies::
 
   pip install pyyaml   # make sure to have libyaml installed first
+
+You might need to install pip before, if you are on Linux::
+  
+  sudo apt-get install python-pip
 
 
 
@@ -103,13 +111,13 @@ To compile everything you've configured::
 
   ./waf
 
-To run the C++ base unit tests (only test basic library behavior)::
-
-  ./waf run_tests
-
 To install the C++ library and the python bindings (if configured successfully; you might need to run this command with sudo)::
 
   ./waf install
+
+To run the C++ base unit tests (only test basic library behavior)::
+
+  ./waf run_tests
 
 To run the python unit tests (include all unittests on algorithms, need python bindings installed first)::
 
@@ -121,4 +129,16 @@ To generate the full documentation (need python bindings installed first)::
 
 Documentation will be located in ``doc/sphinxdoc/_build/html/`` folder.
 
-All built examples will be located in ``buildw/src/examples/`` folder, as well as the vamp plugin file ``libvamp_essentia.so``. In order to use the plugin you will need to place this file to the the standard vamp plugin folder of your system (such as ``/usr/local/lib/vamp/`` on Linux).
+All built examples (including the out-of-box features extractors) will be located in ``build/src/examples/`` folder, as well as the vamp plugin file ``libvamp_essentia.so``. In order to use the plugin you will need to place this file to the the standard vamp plugin folder of your system (such as ``/usr/local/lib/vamp/`` on Linux).
+
+
+Using pre-trained high-level models in Essentia
+-----------------------------------------------
+
+The 2.0.1 version of Essentia includes a number of `pre-trained classifier models for genres, moods and instrumentation
+<algorithms_overview.html#other-high-level-descriptors>`_. In order to use them you need to:
+
+* Install Gaia2 library (supported on Linux/OSX): https://github.com/MTG/gaia/blob/master/README.md
+* Build Essentia 2.0.1 with examples
+* Use ``streaming_extractor_archivemusic``
+

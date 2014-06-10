@@ -14,13 +14,13 @@ Each processing block is called an Algorithm, and has 3 differents types of attr
 * Outputs
 * Parameters
 
-Every algorithm can have any number of each of these (0 included).
+Every algorithm can have any number of each of these (zero included).
 For instance, a "Centroid" algorithm will have 1 input (an array), 1 output (the value
 of the centroid) and 1 parameter (the range of the centroid).
 
 Basically, that is all you need to grasp what an Algorithm is in Essentia.
 
-The general workflow will be the following:
+The general workflow is the following:
 
 1. you instantiate (create) an algorithm
 2. you configure it using the desired parameters
@@ -91,10 +91,10 @@ Configurables
 -------------
 
 The ``Configurable`` class is the base class for the ``Algorithm``. A ``Configurable`` instance is
-an named object that can maintain a fixed set of parameters, and which you can reconfigure any
+a named object that can maintain a fixed set of parameters, and which you can reconfigure any
 number of times. To be able to instantiate a ``Configurable``, you need to implement the
 ``essentia::Configurable::declareParameters()`` method, which will declare all the
-parameters that your Configurable object can take. If you later to try to configure it
+parameters that your Configurable object can take. If you later try to configure it
 with a parameter that wasn't declared in the ``declareParameters()`` method, it will fail.
 
 You can access the current value of a parameter by calling the
@@ -116,7 +116,7 @@ For instance, at the moment of this writing, Parameters can represent strings, i
 floating point numbers, booleans, vectors of strings or reals. More type conversions can
 be added if necessary.
 
-This is especially useful in C++ as it is a statically-typed language, but we would to allow
+This is especially useful in C++ as it is a statically-typed language, but we want to allow
 different types of data for configuring an algorithm. In Python, the point of having variant
 types is moot, thanks to the dynamic typing.
 
@@ -229,12 +229,33 @@ To activate/deactivate the debugging modules at runtime, use the functions::
     unsetDebugLevel(EMemory | EConnectors);  // modules are bitmasks
 
 Note that when a logging module is deactivated, the cost on runtime is minimal
-(ie: you only really pay for logging when you use it). If you wish to completely
+(i.e., you only really pay for logging when you use it). If you wish to completely
 turn off logging, this can be done at compile time by setting the ``DEBUGGING_ENABLED``
 variable in the :essentia:`config.h` file to ``0``. Note that in this case, it will not be
 possible to activate *any* logging at runtime at all, the advantage being that you
 pay absolutely nothing for logging, so don't hesitate to (ab)use logging in your
-algorithms for fear of losing efficiency.
+algorithms because of fear of losing efficiency.
+
+Advanced logging
+^^^^^^^^^^^^^^^^
+
+Sometimes, you wish to only activate logging for a certain period of time, to avoid
+being overwhelmed by too many messages. For example, if your algorithm fails at some point
+in an audio file, you might want to only log some info for the 5 previous calls to the
+generator (frames of the audioloader, usually).
+
+This is done by specifying a list of time ranges (in number of calls to the generator) and
+modules that should be activated during this range. For example::
+
+    DebuggingSchedule s = { {0,   INT_MAX, ENetwork},     // always active
+                            {500, INT_MAX, EAlgorithm },  // from time index 500 until the end
+                            {782, 782,     EScheduler} }; // only for time index 782
+    scheduleDebug(s, ARRAY_SIZE(s));
+
+This will run a network and activate the ENetwork level always, the EAlgorithm
+from the 500th call to the generator until the end, and the EScheduler
+level only on the 782th call to the generator.
+
 
 Logging in python
 -----------------

@@ -34,7 +34,7 @@ const char* PeakDetection::description = DOC("The peak detection algorithm detec
 "\n"
 "References:\n"
 "  [1] Peak Detection,\n"
-"      http://ccrma.stanford.edu/~jos/parshl/Peak_Detection_Steps_3.html");
+"  http://ccrma.stanford.edu/~jos/parshl/Peak_Detection_Steps_3.html");
 
 void PeakDetection::configure() {
   _minPos = parameter("minPosition").toReal();
@@ -172,7 +172,7 @@ void PeakDetection::compute() {
     // sort peaks by magnitude, in case of equality,
     // return the one having smaller position
     std::sort(peaks.begin(), peaks.end(),
-              ComparePeakMagnitude<std::greater<Real>, std::less_equal<Real> >());
+              ComparePeakMagnitude<std::greater<Real>, std::less<Real> >());
   }
   else if (_orderBy == "position") {
     // they're already sorted by position

@@ -17,11 +17,11 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-#include "algorithmfactory.h"
-#include "essentiamath.h"
-#include "poolstorage.h"
-#include "essentiautil.h"
-#include "network.h"
+#include <essentia/algorithmfactory.h>
+#include <essentia/essentiamath.h>
+#include <essentia/streaming/algorithms/poolstorage.h>
+#include <essentia/essentiautil.h>
+#include <essentia/scheduler/network.h>
 
 // helper functions
 #include "streaming_extractorutils.h"
@@ -475,12 +475,17 @@ void computeLowLevel(const string& audioFilename, Pool& neqloudPool, Pool& eqlou
       connect(rhythmExtractor->output("ticks"),        neqloudPool, rhythmspace + "beats_position");
       connect(rhythmExtractor->output("bpm"),          neqloudPool, rhythmspace + "bpm");
       connect(rhythmExtractor->output("estimates"),    neqloudPool, rhythmspace + "bpm_estimates");
-      connect(rhythmExtractor->output("rubatoStart"),  neqloudPool, rhythmspace + "rubato_start");
-      connect(rhythmExtractor->output("rubatoStop"),   neqloudPool, rhythmspace + "rubato_stop");
+      // TODO we need a better rubato estimation algorithm
+      //connect(rhythmExtractor->output("rubatoStart"),  neqloudPool, rhythmspace + "rubato_start");
+      //connect(rhythmExtractor->output("rubatoStop"),   neqloudPool, rhythmspace + "rubato_stop");
       connect(rhythmExtractor->output("bpmIntervals"), neqloudPool, rhythmspace + "bpm_intervals");
+      // discard dummy value for confidence as 'degara' beat tracker is not 
+      // able to compute it
+      rhythmExtractor->output("confidence") >> NOWHERE; 
+
 
       // BPM Histogram descriptors
-      Algorithm* bpmhist = factory.create("BPMHistogramDescriptors");
+      Algorithm* bpmhist = factory.create("BpmHistogramDescriptors");
       connect(rhythmExtractor->output("bpmIntervals"), bpmhist->input("bpmIntervals"));
       connectSingleValue(bpmhist->output("firstPeakBPM"),     neqloudPool, rhythmspace + "first_peak_bpm");
       connectSingleValue(bpmhist->output("firstPeakWeight"),  neqloudPool, rhythmspace + "first_peak_weight");
@@ -535,12 +540,15 @@ void computeLowLevel(const string& audioFilename, Pool& neqloudPool, Pool& eqlou
       connect(rhythmExtractor->output("ticks"),        eqloudPool, rhythmspace + "beats_position");
       connect(rhythmExtractor->output("bpm"),          eqloudPool, rhythmspace + "bpm");
       connect(rhythmExtractor->output("estimates"),    eqloudPool, rhythmspace + "bpm_estimates");
-      connect(rhythmExtractor->output("rubatoStart"),  eqloudPool, rhythmspace + "rubato_start");
-      connect(rhythmExtractor->output("rubatoStop"),   eqloudPool, rhythmspace + "rubato_stop");
+      //connect(rhythmExtractor->output("rubatoStart"),  eqloudPool, rhythmspace + "rubato_start");
+      //connect(rhythmExtractor->output("rubatoStop"),   eqloudPool, rhythmspace + "rubato_stop");
       connect(rhythmExtractor->output("bpmIntervals"), eqloudPool, rhythmspace + "bpm_intervals");
+      // discard dummy value for confidence as 'degara' beat tracker is not 
+      // able to compute it
+      rhythmExtractor->output("confidence") >> NOWHERE; 
 
       // BPM Histogram descriptors
-      Algorithm* bpmhist = factory.create("BPMHistogramDescriptors");
+      Algorithm* bpmhist = factory.create("BpmHistogramDescriptors");
       connect(rhythmExtractor->output("bpmIntervals"), bpmhist->input("bpmIntervals"));
       connectSingleValue(bpmhist->output("firstPeakBPM"),     eqloudPool, rhythmspace + "first_peak_bpm");
       connectSingleValue(bpmhist->output("firstPeakWeight"),  eqloudPool, rhythmspace + "first_peak_weight");

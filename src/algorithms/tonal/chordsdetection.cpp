@@ -31,13 +31,15 @@ const char* ChordsDetection::description = DOC("Using pitch profile classes, thi
 "Note:\n"
 "  - This algorithm assumes that input pcps have been computed with framesize = 2*hopsize\n"
 "\n"
+"Quality: experimental (prone to errors, algorithm needs improvement)\n"
+"\n"
 "References:\n"
-"  [1] Gomez, E., 'Tonal Description of Polyphonic Audio for Music Content \n"
-"      Processing', INFORMS Journal On Computing, Vol. 18, No. 3, Summer \n"
-"      2006, pp. 294-304.\n"
-"  [2] Temperley, D. 'What's key for key? The Krumhansl-Schmuckler \n"
-"      key-finding algorithm reconsidered', Music Perception 17(1) pp. \n"
-"      65-100, 1999. http://www.links.cs.cmu.edu/music-analysis/key.html");
+"  [1] E. Gómez, \"Tonal Description of Polyphonic Audio for Music Content\n"
+"  Processing,\" INFORMS Journal on Computing, vol. 18, no. 3, pp. 294–304,\n"
+"  2006.\n\n"
+"  [2] D. Temperley, \"What's key for key? The Krumhansl-Schmuckler\n"
+"  key-finding algorithm reconsidered\", Music Perception vol. 17, no. 1,\n"
+"  pp. 65-100, 1999.");
 
 void ChordsDetection::configure() {
   Real wsize = parameter("windowSize").toReal();
@@ -114,11 +116,10 @@ ChordsDetection::ChordsDetection() : AlgorithmComposite() {
   // FIXME: this is just a temporary hack...
   //        the correct way to do this is to have the algorithm output the chords
   //        continuously while processing, which requires a FrameCutter for vectors
-  BufferInfo binfo;
-  binfo.size = 16384;
-  binfo.maxContiguousElements = 0;
-  _chords.setBufferInfo(binfo);
-  _strength.setBufferInfo(binfo);
+  // Need to set the buffer type to multiple frames as all the chords
+  // are output all at once
+  _chords.setBufferType(BufferUsage::forMultipleFrames);
+  _strength.setBufferType(BufferUsage::forMultipleFrames);
 
   attach(_pcp, _poolStorage->input("data"));
 }

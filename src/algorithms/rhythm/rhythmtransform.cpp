@@ -19,6 +19,7 @@
 
 #include "rhythmtransform.h"
 #include "essentiamath.h"
+#include "tnt/tnt2vector.h"
 #include <cfloat>
 using namespace std;
 
@@ -27,11 +28,13 @@ namespace standard {
 
 const char* RhythmTransform::name = "RhythmTransform";
 const char* RhythmTransform::description = DOC("The Rhythm Transform algorithm is based on the rhythm transform as described in [1]. It computes a rhythmical representation of the input signal in the rhythm domain much like FFT computes a representation in the frequency domain. Additionally features as rhythmic centroid and MFCCs can be calculated from this rhythmic representation.\n"
-"Note that parameters \"frameSize\" and \"hopSize\" are defined for the rhythm transformation (fft transform on the rhythm space) and have a different meaning than the sizes in the temporal dimension.\n"
+"Note that parameters \"frameSize\" and \"hopSize\" are defined for the rhythm transformation (FFT transform on the rhythm space) and have a different meaning than the sizes in the temporal dimension.\n"
 "\n"
 "References:\n"
-"  [1] Enric Guaus, Perfecto Herrera, The Rhythm Transform: Towards a Generic Rhythm Descriptor, 2005.\n"
-);
+"  [1] E. Guaus and P. Herrera, \"The rhythm transform: towards a generic\n"
+"  rhythm description,\" in International Computer Music Conference (ICMC’05),\n"
+"  2005.");
+
 
 void RhythmTransform::configure() {
   _rtFrameSize = parameter("frameSize").toInt();
@@ -83,9 +86,9 @@ void RhythmTransform::compute() {
       _w->compute();
       _spec->compute();
 
-      // square the resulting spectrum
+      // square the resulting spectrum, sum periodograms across bands
       for (int bin=0; bin<(int)rhythmSpectrum.size(); ++bin)
-	      bandSpectrum[bin] = rhythmSpectrum[bin]*rhythmSpectrum[bin];
+	      bandSpectrum[bin] += rhythmSpectrum[bin]*rhythmSpectrum[bin];
     }
     output.push_back(bandSpectrum);
     i += _rtHopSize;
@@ -107,13 +110,12 @@ const char* RhythmTransform::description = standard::RhythmTransform::descriptio
 
 RhythmTransform::RhythmTransform() : AlgorithmComposite() {
 
-  declareInput(_melbands, "melBands","the energy in the melbands");
-  declareOutput(_rhythmTransform, 0, "rhythm", "consecutive frames in the rhythm domain");
-
   _poolStorage = new PoolStorage<vector<Real> >(&_pool, "internal.mel_bands");
   _rhythmAlgo = standard::AlgorithmFactory::create("RhythmTransform");
 
-  _melbands  >>  _poolStorage->input("data");
+  declareInput(_poolStorage->input("data"), 1, "melBands","the energy in the melbands");
+  declareOutput(_rhythmTransform, 0, "rhythm", "consecutive frames in the rhythm domain");
+  _rhythmTransform.setBufferType(BufferUsage::forMultipleFrames);
 }
 
 void RhythmTransform::configure() {
@@ -133,10 +135,10 @@ AlgorithmStatus RhythmTransform::process() {
   vector<vector<Real> > rhythmTransform;
 
   _rhythmAlgo->input("melBands").set(bands);
-  _rhythmAlgo->input("rhythm").set(rhythmTransform);
+  _rhythmAlgo->output("rhythm").set(rhythmTransform);
   _rhythmAlgo->compute();
 
-  _rhythmTransform.push(rhythmTransform);
+  _rhythmTransform.push(vecvecToArray2D(rhythmTransform));
 
   return OK;
 }
