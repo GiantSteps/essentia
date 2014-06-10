@@ -18,6 +18,9 @@ def options(ctx):
     ctx.add_option('--with-vamp', action='store_true',
                    dest='WITH_VAMP', default=False,
                    help='build the vamp plugin wrapper')
+    ctx.add_option('--realtime-libs', action='store_true',
+                   dest='WITH_RT', default=False,
+                   help='include only fftw and taglib for lighter realtime environement')
 
     #add option --with-gaia
 
@@ -41,6 +44,7 @@ def configure(ctx):
     ctx.env.WITH_PYTHON   = ctx.options.WITH_PYTHON
     ctx.env.WITH_VAMP     = ctx.options.WITH_VAMP
     ctx.env.WITH_STATIC_EXAMPLES = ctx.options.WITH_STATIC_EXAMPLES
+    ctx.env.WITH_RT       = ctx.options.WITH_RT
 
     if ctx.env.WITH_STATIC_EXAMPLES:
         ctx.env.WITH_EXAMPLES = True
@@ -48,17 +52,21 @@ def configure(ctx):
     ctx.env.ALGOIGNORE = []
     #ctx.env.ALGOIGNORE += ['GaiaTransform'] #TODO gaia
 
-
-    ctx.check_cfg(package='libavcodec', uselib_store='AVCODEC',
+    if ctx.env.WITH_RT :
+        print("")
+        print("=======================RealTime Mode : Ignoring ffmpeg librairies=======================")
+        print("")
+    else :
+        ctx.check_cfg(package='libavcodec', uselib_store='AVCODEC',
                   args=['--cflags', '--libs'], mandatory=False)
 
-    ctx.check_cfg(package='libavformat', uselib_store='AVFORMAT',
+        ctx.check_cfg(package='libavformat', uselib_store='AVFORMAT',
                   args=['--cflags', '--libs'], mandatory=False)
 
-    ctx.check_cfg(package='libavutil', uselib_store='AVUTIL',
+        ctx.check_cfg(package='libavutil', uselib_store='AVUTIL',
                   args=['--cflags', '--libs'], mandatory=False)
 
-    ctx.check_cfg(package='libswresample', uselib_store='SWRESAMPLE',
+        ctx.check_cfg(package='libswresample', uselib_store='SWRESAMPLE',
                   args=['--cflags', '--libs'], mandatory=False)
 
     if ctx.env.WITH_STATIC_EXAMPLES:
@@ -84,10 +92,11 @@ def configure(ctx):
     ctx.check_cfg(package='fftw3f', uselib_store='FFTW',
                   args=['--cflags', '--libs'])
 
-    ctx.check_cfg(package='samplerate', uselib_store='SAMPLERATE',
+    if not ctx.env.WITH_RT :
+        ctx.check_cfg(package='samplerate', uselib_store='SAMPLERATE',
                   args=['--cflags', '--libs'],mandatory=False)
 
-    ctx.check_cfg(package='gaia2', uselib_store='GAIA2',
+        ctx.check_cfg(package='gaia2', uselib_store='GAIA2',
                   args=['--cflags', '--libs'], mandatory=False)
 
     if ctx.env.WITH_EXAMPLES or ctx.env.WITH_VAMP:
