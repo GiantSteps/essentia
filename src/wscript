@@ -85,7 +85,7 @@ def configure(ctx):
                   args=['--cflags', '--libs'])
 
     ctx.check_cfg(package='samplerate', uselib_store='SAMPLERATE',
-                  args=['--cflags', '--libs'])
+                  args=['--cflags', '--libs'],mandatory=False)
 
     ctx.check_cfg(package='gaia2', uselib_store='GAIA2',
                   args=['--cflags', '--libs'], mandatory=False)
