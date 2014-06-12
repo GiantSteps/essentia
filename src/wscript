@@ -69,10 +69,10 @@ def configure(ctx):
         ctx.check_cfg(package='libswresample', uselib_store='SWRESAMPLE',
                   args=['--cflags', '--libs'], mandatory=False)
 
-    if ctx.env.WITH_STATIC_EXAMPLES:
-        print('Static examples incompatible with TagLib, skipping TagLib detection...')
-    else:
-        ctx.check_cfg(package='taglib', uselib_store='TAGLIB',
+   	if ctx.env.WITH_STATIC_EXAMPLES:
+       		 print('Static examples incompatible with TagLib, skipping TagLib detection...')
+    	else:
+        	ctx.check_cfg(package='taglib', uselib_store='TAGLIB',
                       args=['--cflags', '--libs'], mandatory=False)
 
     # needed by ffmpeg for the INT64_C macros
