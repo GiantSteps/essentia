@@ -113,9 +113,18 @@ int PyStreamingAlgorithm::tp_init(PyStreamingAlgorithm *self, PyObject *args, Py
 void PyStreamingAlgorithm::tp_dealloc (PyObject* obj) {
   PyStreamingAlgorithm* self = reinterpret_cast<PyStreamingAlgorithm*>(obj);
   // FIXME: need to deallocate something here I guess...
-  //if (self->isGenerator) streaming::deleteNetwork(self->algo);
-
-  self->ob_type->tp_free(obj);
+  if (self->isGenerator){
+  try{
+  	scheduler::Network(self->algo,true).clear();
+	}
+	catch (exception& e) {
+    ostringstream msg;
+    msg << "PyStreamingAlgorithm.dealloc: " << e.what();
+    PyErr_SetString(PyExc_ValueError, e.what());
+    
+  }
+  }
+  //self->ob_type->tp_free(obj);
 }
 
 PyObject* PyStreamingAlgorithm::configure (PyStreamingAlgorithm* self, PyObject* args, PyObject* keywds) {
@@ -379,6 +388,9 @@ static PyMethodDef PyStreamingAlgorithm_methods[] = {
 
   { "getStruct", (PyCFunction)PyStreamingAlgorithm::getStruct, METH_NOARGS,
       "Returns the doc struct for the algorithm"},
+	
+  { "clear", (PyCFunction)PyStreamingAlgorithm::tp_dealloc, METH_NOARGS,
+      "delete associated network"},
 
   { NULL } /* Sentinel */
 };

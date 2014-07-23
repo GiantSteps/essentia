@@ -110,9 +110,10 @@ int bufferSize=10;
    
 void configure() {
      _algo->configure(_params);
-	_bands.setAcquireSize(_algo->parameter("frameWidth").toInt()+1);
-    _bands.setReleaseSize(1);
-    if(!_algo->parameter("Online").toBool()) throw EssentiaException("atm, can not be in streaming mode without online option set to true");
+	   _bands.setAcquireSize(_algo->parameter("frameWidth").toInt()+1);
+     _bands.setReleaseSize(1);
+
+   // if(!_algo->parameter("Online").toBool()) throw EssentiaException("atm, can not be in streaming mode without online option set to true");
 
   }
 

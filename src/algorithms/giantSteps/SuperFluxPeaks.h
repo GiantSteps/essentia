@@ -112,7 +112,7 @@ bool _rawmode;
   void declareParameters() {
 	declareParameter("frameRate", "frameRate", "(0,inf)", 172.);
     declareParameter("threshold", "threshold for peak-picking", "(0,inf)", 1.25);
-	declareParameter("combine", "ms for onset combination", "(0,inf)", 30);
+	declareParameter("combine", "ms for onset combination", "(0,inf)", 30.0);
     declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100);
 	declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30);
 	declareParameter("rawmode", "output mode: if true, returns array of same size as novelty function, with 1 where peaks stands, if false, output list of peaks instants", "{true,false}", true);
@@ -123,7 +123,7 @@ bool _rawmode;
   // link algo parameter with streaming burffer options
 
 void configure(){
-EXEC_DEBUG("configuring Peaks");
+//EXEC_DEBUG("configuring Peaks");
 _algo->configure(this->_params);
 int aqS =  _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_avg").toInt(),_algo->parameter("pre_max").toInt()) / 1000;
     EXEC_DEBUG("setAcquireSize" << aqS);
@@ -136,6 +136,7 @@ int aqS =  _algo->parameter("frameRate").toReal() * max(_algo->parameter("pre_av
     _peaks.setReleaseSize(1);
     }
     else{
+      cout<<"aq"<<aqS<<endl;
     _peaks.setAcquireSize(aqS);
     _peaks.setReleaseSize(aqS);
     }

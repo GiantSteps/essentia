@@ -96,8 +96,8 @@ Real _threshold = parameter("threshold").toReal();
 */
 
 // bool isStream = size <= max(_pre_avg,_pre_max )+1;
-E_DEBUG(EAlgorithm,"sfpeaks size " << size <<"peaksS" << peaks.size());
-E_DEBUG(EAlgorithm,"maxSize" << maxs.size() <<"/" << _pre_max << "mov avgsize " << avg.size()<< "/" << _pre_avg);
+// E_DEBUG(EAlgorithm,"sfpeaks size " << size <<"peaksS" << peaks.size());
+// E_DEBUG(EAlgorithm,"maxSize" << maxs.size() <<"/" << _pre_max << "mov avgsize " << avg.size()<< "/" << _pre_avg);
 
 
 
@@ -117,7 +117,7 @@ if(_rawMode){
 		if(lastPidx>=0)lastPidx++;
 		if(signal[i]==maxs[i] && signal[i]>avg[i]+_threshold && signal[i]>0){
 			if(!(lastPidx<_combine*frameRate  &&  lastPidx >=0)) {
-				E_DEBUG(EAlgorithm,"peakDetected");
+				// E_DEBUG(EAlgorithm,"peakDetected");
 				//cout <<"/" << avg.size() <<"/" <<  _threshold <<"/" <<  maxs.size()<<endl;
 				peaks[i-zeroStep]=signal[i];	
 				lastPidx = 0;
@@ -187,24 +187,30 @@ AlgorithmStatus SuperFluxPeaks::process() {
 	}
 	
 	if(!_rawmode){
-	vector<Real> peaks;
-	_algo->input("novelty").set(_signal.tokens());
-	_algo->output("peaks").set(peaks);
+		vector<Real> peaks;
+		_algo->input("novelty").set(_signal.tokens());
+		_algo->output("peaks").set(peaks);
 
-	_algo->compute();
-	
-	_peaks.setAcquireSize(peaks.size());
-	_peaks.setReleaseSize(peaks.size());
-	for (int i = 0 ; i < peaks.size();i++){
-	_peaks.tokens()[i]=peaks[i];
+		_algo->compute();
+		
+		_peaks.setAcquireSize(peaks.size());
+		_peaks.setReleaseSize(peaks.size());
+		for (int i = 0 ; i < peaks.size();i++){
+			cout << "11" << peaks.size() <<endl;
+		_peaks.tokens()[i]=peaks[i];
+		// cout << peaks.acquireSize() <<endl;
+		}
+
+	// 	fastcopy(&_peaks.tokens(),&peaks,peaks.size());
 	}
-// 	fastcopy(&_peaks.tokens(),&peaks,peaks.size());
-}
 else{
+
+
 	_algo->input("novelty").set(_signal.tokens());
 	_algo->output("peaks").set(_peaks.tokens());
 	_algo->compute();
 }
+cout << "ok" <<endl;
 	// give back the tokens that were reserved
 	releaseData();
 

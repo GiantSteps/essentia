@@ -272,7 +272,7 @@ void computeSegments(const string& audioFilename, Pool& neqloudPool,
   sbic->input("features").set(featuresArray);
   sbic->output("segmentation").set(segments);
   sbic->compute();
-  Real analysisSampleRate = options.value<Real>("sampleRate");
+  Real analysisSampleRate = options.value<Real>("analysisSampleRate");
   Real step = options.value<Real>("lowlevel.hopSize");
   for (int i=0; i<int(segments.size()); ++i) {
     segments[i] *= step/analysisSampleRate;
