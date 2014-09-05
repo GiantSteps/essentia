@@ -86,8 +86,10 @@ def configure(ctx):
     if is_squeeze:
         ctx.env.LINKFLAGS += [ '-lyaml' ]
     else:
-        ctx.check_cfg(package='yaml-0.1', uselib_store='YAML',
-                      args=['--cflags', '--libs'])
+		if not ctx.env.WITH_RT:
+			ctx.check_cfg(package='yaml-0.1', uselib_store='YAML', args=['--cflags', '--libs'])
+		else:
+			ctx.check_cfg(package='yaml-0.1', uselib_store='YAML', args=['--cflags', '--libs'], mandatory=False)
 
     ctx.check_cfg(package='fftw3f', uselib_store='FFTW',
                   args=['--cflags', '--libs'])
@@ -116,7 +118,10 @@ def configure(ctx):
         return ('HAVE_%s' % name.upper()) in ctx.env['define_key']
 
     # these are mandatory dependencies
-    ctx.env.USES = 'FFTW YAML'
+    if ctx.env.WITH_RT:
+        ctx.env.USES = 'FFTW'
+    else:
+        ctx.env.USES = 'FFTW YAML'
 
     algos = [ 'AudioLoader', 'MonoLoader', 'EqloudLoader', 'EasyLoader', 'MonoWriter', 'AudioWriter' ]
     if has('avcodec') and has('avformat') and has('avutil'):
@@ -165,9 +170,11 @@ def configure(ctx):
         print('  The following algorithms will be ignored: %s\n' % algos)
         ctx.env.ALGOIGNORE += algos
 
-
     print('=======================================================================================')
-
+ 
+    if ctx.env.WITH_RT:
+        ctx.env.ALGOIGNORE = [ 'AudioLoader', 'MonoLoader', 'EqloudLoader', 'EasyLoader', 'MonoWriter', 'AudioWriter', 'Resample', 'MetadataReader', 'GaiaTransform', 'YamlInput', 'YamlOutput']
+        print "IGNORING ALL ALGORITHMS FOR ESSENTIA RT"
 
 from waflib.Task import Task
 class BuildAlgoReg(Task):
@@ -210,6 +217,10 @@ def build(ctx):
     if 'AVCODEC' not in ctx.env.USES:
         sources = [ s for s in sources if 'audiocontext' not in str(s) ]
 
+    # do not compile anything with yaml if it's realtime
+    if ctx.env.WITH_RT:
+        sources = [ s for s in sources if 'yaml' not in str(s) ]    
+    
     # add all algorithms found in the algorithms/ folder
     sources += [ ctx.path.find_resource('algorithms/essentia_algorithms_reg.cpp') ]
     sources += [ ctx.path.find_resource(algo['source']) for algo in algos.values() ]
