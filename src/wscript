@@ -230,15 +230,19 @@ def build(ctx):
     ctx.env.INCLUDES = [ '.', 'essentia', 'essentia/scheduler', 'essentia/streaming',
                          'essentia/streaming/algorithms', 'essentia/utils',
                          '3rdparty' ]
-
+                         
+    if ctx.env.WITH_RT:
+        targetName = 'essentia_rt'
+    else:
+        targetName = 'essentia'
     ctx.stlib(
         source   = sources,
-        target   = 'essentia',
+        target   = targetName,
         use      = ctx.env.USES,
         install_path = '${PREFIX}/lib',
         #includes = ctx.env.includes
     )
-
+    
     # install headers if asked to
     headers = ctx.path.ant_glob('essentia/**/*.h')
     for h in headers:
