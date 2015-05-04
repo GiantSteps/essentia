@@ -27,6 +27,8 @@
 #include "vectorinput.h"
 #include "vectoroutput.h"
 
+#include "ringbufferinput.h"
+
 
 
 namespace essentia {

@@ -90,7 +90,7 @@ void MaxFilter::compute() {
     for(int j = readIdx ; j < size ; j++){
         _bufferFillIdx %=_width;
         _buffer[_bufferFillIdx] = array[j];
-        filtered[j] = *std::max_element(_buffer.begin(), _buffer.end());
+        filtered[j] = *std::max(_buffer.begin(), _buffer.end());
         _bufferFillIdx++;
     }
 }

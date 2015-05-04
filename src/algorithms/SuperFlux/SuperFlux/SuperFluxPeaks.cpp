@@ -22,6 +22,9 @@
 #include <limits>
 #include "essentiamath.h"
 
+
+#define HEURISTIC_RATIO_SCALE
+
 using namespace std;
 
 namespace essentia {
@@ -89,14 +92,22 @@ void SuperFluxPeaks::compute() {
         
         // we want to avoid ratioThreshold noisy activation in really low flux parts so we set noise floor
         // set by default to 10-7 (REALLY LOW for a flux)
-        if(signal[i]==maxs[i]&& signal[i]>1e-8){
+        if(signal[i]==maxs[i]&& signal[i]>1e-7){
             bool isOverLinearThreshold = _threshold>0 &&  signal[i]>avg[i]+_threshold ;
-            bool isOverratioThreshold = _ratioThreshold>0 &&avg[i]>0 && signal[i]*1.0/avg[i]>_ratioThreshold;
+            bool isOverratioThreshold =_ratioThreshold>0 &&avg[i]>0 && signal[i]*1.0/avg[i]>
+#ifdef HEURISTIC_RATIO_SCALE
+            // exponential scale :
+            // signal avg = 10e-2 : _ratioThreshold * 2
+            // signal avg = 10e-6 : _ratioThreshold * 100
             
+             _ratioThreshold * std::pow(avg[i] *10 ,-.4247);
+#else
+            _ratioThreshold;
+#endif
             
         if( isOverLinearThreshold||isOverratioThreshold)
            {
-            
+//               cout << signal[i] <<";"<< avg[i] <<endl;
             peakTime = i*1.0/frameRate;
             if((nDetec>0 && peakTime-peaks[nDetec-1]>_combine)  ||  nDetec ==0) {
                 peaks[nDetec] = peakTime;

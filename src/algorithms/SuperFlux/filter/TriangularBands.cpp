@@ -56,7 +56,7 @@ void TriangularBands::compute() {
     throw EssentiaException("TriangularBands: the size of the input spectrum is not greater than one");
   }
 
-  Real frequencyScale = (_sampleRate / 2.0) / (spectrum.size() - 1);
+  Real frequencyScale =  (spectrum.size() - 1)/(_sampleRate / 2.0);
   int nBands = int(_bandFrequencies.size() - 2);
 
   bands.resize(nBands);
@@ -64,12 +64,15 @@ void TriangularBands::compute() {
 
   for (int i=0; i<nBands; i++) {
 
-    int startBin = int(_bandFrequencies[i] / frequencyScale +.5);
-    int midBin = int(_bandFrequencies[i + 1] / frequencyScale +.5 );
-    int endBin = int(_bandFrequencies[i + 2] / frequencyScale +.5);
+    int startBin = int(_bandFrequencies[i] * frequencyScale +.5);
+    int midBin = int(_bandFrequencies[i + 1] * frequencyScale +.5 );
+    int endBin = int(_bandFrequencies[i + 2] * frequencyScale +.5);
   
 	  // finished
-    if (startBin >= int(spectrum.size())) break;
+      if (startBin >= int(spectrum.size())){
+          
+       break;
+      }
 
     // going to far
     if (endBin > int(spectrum.size())) endBin = spectrum.size();
@@ -78,16 +81,16 @@ void TriangularBands::compute() {
     Real norm = 0;
     if (midBin != startBin && midBin != endBin && endBin != startBin) {
       for (int j=startBin; j<=endBin; j++) {
-        norm +=  j < midBin ? (j-startBin) / (midBin - startBin) 
-                            : 1 - (j-midBin) / (endBin-midBin);
+        norm +=  j < midBin ? (j-startBin) *1.0/ (midBin - startBin)
+                            : 1 - (j-midBin) *1.0/ (endBin-midBin);
       }
     }
-
+//      cout << midBin <<" f: "<< _bandFrequencies[i + 1] << " : " ;
     for (int j=startBin; j <= endBin; j++) {
       Real TriangF;
       if (midBin != startBin && midBin != endBin && endBin != startBin) {
-        TriangF = j < midBin ? (j-startBin) / (midBin - startBin) 
-                             : 1 - (j-midBin) / (endBin-midBin);
+        TriangF = j < midBin ? (j-startBin) *1.0/ (midBin - startBin)
+                             : 1 - (j-midBin) *1.0/ (endBin-midBin);
         TriangF /= norm;
 	    }
       else if (startBin == endBin) {
@@ -98,9 +101,10 @@ void TriangularBands::compute() {
         // double bin band
 		    TriangF = 0.5;
 	    }
-	
-      bands[i] += TriangF * spectrum[j] * spectrum[j]; 
+//        cout << TriangF <<",";
+      bands[i] += TriangF * spectrum[j] ;
     }
+//      cout << "\n";
     if (_isLog) bands[i] = log2(1 + bands[i]);
   }
 }

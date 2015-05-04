@@ -23,6 +23,8 @@
 #include "poolstorage.h"
 #include "copy.h"
 
+
+
 using namespace std;
 using namespace essentia;
 using namespace essentia::streaming;
@@ -69,9 +71,9 @@ void SuperFluxExtractor::createInnerNetwork() {
     w = factory.create("Windowing","type","hann");
     
     spectrum = factory.create("Spectrum");
-    triF = factory.create("TriangularBands","log",false);
+    triF = factory.create("TriangularBands","log",true);
     superFluxP = factory.create("SuperFluxPeaks");
-    superFluxF = factory.create("SuperFluxNovelty","binWidth",8,"frameWidth",2);
+    superFluxF = factory.create("SuperFluxNovelty","binWidth",3,"frameWidth",2);
     
     vout = new essentia::streaming::VectorOutput<Real>();
    
@@ -93,7 +95,7 @@ void SuperFluxExtractor::configure() {
                         		);
 
 
-  superFluxP->configure(INHERIT("ratioThreshold"),INHERIT("threshold"),"frameRate", sampleRate*1.0/(hopSize),INHERIT("combine"),"pre_avg",100.,"pre_max",30.);
+  superFluxP->configure(INHERIT("ratioThreshold"),INHERIT("threshold"),"frameRate", sampleRate*1.0/(hopSize),INHERIT("combine"),"pre_avg",100.,"pre_max",80.);
 
 
 }
@@ -140,6 +142,10 @@ void SuperFluxExtractor::configure() {
 void SuperFluxExtractor::createInnerNetwork() {
   _SuperFluxExtractor = streaming::AlgorithmFactory::create("SuperFluxExtractor");
   _vectorInput = new streaming::VectorInput<Real>();
+    
+
+
+    
     _vectorOut = new streaming::VectorOutput<std::vector<Real> >();
 
   *_vectorInput                        >>  _SuperFluxExtractor->input("signal");
