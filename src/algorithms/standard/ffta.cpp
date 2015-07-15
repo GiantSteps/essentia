@@ -89,8 +89,9 @@ void FFTA::compute() {
     fft[0] = std::complex<Real>(accelBuffer.realp[0]/2.0f, 0.0f);
     
     for(int i=1; i<size/2; i++) {
-        std::complex<Real> point(accelBuffer.realp[i]/2.0f, accelBuffer.imagp[i]/2.0f);
-        fft[i] = point;
+        //std::complex<Real> point(accelBuffer.realp[i]/2.0f, accelBuffer.imagp[i]/2.0f);
+        fft[i].real(accelBuffer.realp[i]/2.0f);
+        fft[i].imag(accelBuffer.imagp[i]/2.0f);
     }
     
     //Construct the last point

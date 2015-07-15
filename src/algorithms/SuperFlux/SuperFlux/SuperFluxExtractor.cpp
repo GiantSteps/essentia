@@ -55,6 +55,7 @@ SuperFluxExtractor::SuperFluxExtractor() : _configured(false) {
     triF->output("bands")>>superFluxF->input("bands");
     superFluxF->output("Differences")  >>superFluxP->input("novelty");
     superFluxP->output("peaks") >> _onsets;
+    superFluxP->output("strengths") >> DEVNULL;
     
     
 
@@ -143,7 +144,8 @@ void SuperFluxExtractor::createInnerNetwork() {
     _vectorOut = new streaming::VectorOutput<std::vector<Real> >();
 
   *_vectorInput                        >>  _SuperFluxExtractor->input("signal");
-  _SuperFluxExtractor->output("onsets")  >>  _vectorOut->input("data");//PC(_pool, "onsets.times");
+  _SuperFluxExtractor->output("onsets")  >>  _vectorOut->input("data");
+  _SuperFluxExtractor->output("strengths")  >>  DEVNULL;
   _network = new scheduler::Network(_vectorInput);
 }
 

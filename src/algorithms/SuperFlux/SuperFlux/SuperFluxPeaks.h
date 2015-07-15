@@ -30,7 +30,7 @@ class SuperFluxPeaks : public Algorithm {
 private:
     Input<std::vector<Real> > _signal;
     Output<std::vector<Real> > _peaks;
-    
+    Output<std::vector<Real> > _strengths;
     standard::Algorithm* _movAvg;
     standard::Algorithm* _maxf;
     
@@ -49,7 +49,8 @@ private:
 public:
     SuperFluxPeaks() {
         declareInput(_signal, "novelty", "the input novelty");
-        declareOutput(_peaks, "peaks", "the input novelty");
+        declareOutput(_peaks, "peaks", "the output instants [s]");
+        declareOutput(_strengths, "strengths", "the output instants [s]");
         _movAvg = AlgorithmFactory::create("MovingAverage");
         _maxf = AlgorithmFactory::create("MaxFilter");
         peakTime = 0;
@@ -97,6 +98,7 @@ class SuperFluxPeaks : public AccumulatorAlgorithm {
 protected:
     Sink<Real> _signal;
     Source<std::vector<Real> > _peaks;
+    Source<std::vector<Real> > _strengths;
     
     standard::Algorithm * _algo;
     
@@ -104,7 +106,7 @@ protected:
     float current_t;
     
     float framerate,_combine;
-    std::vector<Real> onsTime;
+    std::vector<Real> onsTime,onsStrength;
 
     
     
@@ -114,6 +116,7 @@ public:
         _algo = standard::AlgorithmFactory::create("SuperFluxPeaks");
         declareInputStream(_signal, "novelty", "the input novelty");
         declareOutputResult(_peaks, "peaks", "peaks instants [s]");
+        declareOutputResult(_strengths, "strengths", "peaks values [novelty unit]");
     };
     ~SuperFluxPeaks(){
         delete _algo;

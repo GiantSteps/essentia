@@ -46,7 +46,7 @@ RingBufferInput::~RingBufferInput()
 void RingBufferInput::configure()
 {
 	delete _impl;
-	_impl = new RingBufferImpl(RingBufferImpl::kAvailable,parameter("bufferSize").toInt());
+	_impl = new RingBufferImpl(RingBufferImpl::kAvailable,_bufferSize);
 }
 
 void RingBufferInput::add(Real* inputData, int size)

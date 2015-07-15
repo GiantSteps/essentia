@@ -20,7 +20,7 @@
 #ifndef ESSENTIA_STREAMING_RINGBUFFERINPUT_H
 #define ESSENTIA_STREAMING_RINGBUFFERINPUT_H
 
-#include "streamingalgorithm.h"
+#include "../streamingalgorithm.h"
 
 namespace essentia {
 namespace streaming {
@@ -33,7 +33,9 @@ class RingBufferInput : public Algorithm {
  public:
   RingBufferInput();
   ~RingBufferInput();
-
+    int _bufferSize = 8192;
+    
+    
   void add(Real* inputData, int size);
 
   AlgorithmStatus process();
@@ -43,7 +45,7 @@ class RingBufferInput : public Algorithm {
   }
 
   void declareParameters() {
-    declareParameter("bufferSize", "the size of the ringbuffer", "", 8192);
+// not called as its not registered
   }
 
   void configure();

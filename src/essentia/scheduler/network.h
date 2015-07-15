@@ -143,6 +143,8 @@ class Network {
   void deleteAlgorithms();
 
 
+    void initStack();
+    void runStack(bool endOfStream);
   /**
    * Find and return an algorithm by its name.
    * Throw an exception if no algorithm was found with the given name.

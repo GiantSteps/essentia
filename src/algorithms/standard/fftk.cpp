@@ -47,11 +47,11 @@ FFTK::~FFTK() {
   // of scope, so make sure we're not doing stupid things here
   // This will cause a memory leak then, but it is definitely a better choice
   // than a crash (right, right??? :-) )
-  if (essentia::isInitialized()) {
+//  if (essentia::isInitialized()) {
       free(_fftCfg);
       free(_input);
       free(_output);
-  }
+//  }
 }
 
 void FFTK::compute() {

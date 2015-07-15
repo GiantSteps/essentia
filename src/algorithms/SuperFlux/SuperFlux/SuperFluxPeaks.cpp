@@ -62,8 +62,10 @@ void SuperFluxPeaks::compute() {
     
     const vector<Real>& signal = _signal.get();
     vector<Real>& peaks = _peaks.get();
+    vector<Real>& strengths = _strengths.get();
     if (signal.empty()) {
         peaks.resize(0);
+        strengths.resize(0);
         return;
     }
     
@@ -90,23 +92,28 @@ void SuperFluxPeaks::compute() {
         // we want to avoid ratioThreshold noisy activation in really low flux parts so we set noise floor
         // set by default to 10-7 (REALLY LOW for a flux)
         if(signal[i]==maxs[i]&& signal[i]>1e-8){
+           
             bool isOverLinearThreshold = _threshold>0 &&  signal[i]>avg[i]+_threshold ;
             bool isOverratioThreshold = _ratioThreshold>0 &&avg[i]>0 && signal[i]*1.0/avg[i]>_ratioThreshold;
             
             
-        if( isOverLinearThreshold||isOverratioThreshold)
+        if( (_threshold == 0 || isOverLinearThreshold) && (_ratioThreshold == 0 || isOverratioThreshold))
            {
+               
+//               cout << "found : lin" << isOverLinearThreshold << "ratio: " << isOverratioThreshold << endl;
             
             peakTime = i*1.0/frameRate;
             if((nDetec>0 && peakTime-peaks[nDetec-1]>_combine)  ||  nDetec ==0) {
                 peaks[nDetec] = peakTime;
+                strengths[nDetec] = signal[i];
                 nDetec++;
             }
         }
         }
+
         
     }
-    
+    strengths.resize(nDetec);
     peaks.resize(nDetec);
     return;
     
@@ -136,10 +143,12 @@ void SuperFluxPeaks::consume() {
 
 
     int _aquireSize = _signal.acquireSize();
-    
+
         std::vector<Real> out = std::vector<Real>(_aquireSize);
+        std::vector<Real> outStrengths = std::vector<Real>(_aquireSize);
         _algo->input("novelty").set(_signal.tokens());
         _algo->output("peaks").set(out);
+        _algo->output("strengths").set(outStrengths);
         _algo->compute();
     
     
@@ -153,27 +162,35 @@ void SuperFluxPeaks::consume() {
         }
         
         // copy if there is something to copy
-        if(!trimBeg || onsTime.size()>1){
+        if(!trimBeg || out.size()>1){
             onsTime.insert(onsTime.end(), out.begin(),out.end() - (trimBeg?1:0));
+            onsStrength.insert(onsStrength.end(), outStrengths.begin(),outStrengths.end() - (trimBeg?1:0));
         }
         
     }
+    
 
     current_t+=_aquireSize/framerate;
     
 }
 
 void SuperFluxPeaks::finalProduce() {
+
     _peaks.push((std::vector<Real>) onsTime);
+    _strengths.push((std::vector<Real>)onsStrength);
     current_t = 0;
-    
+
     reset();
+
+
 }
 
 
 void SuperFluxPeaks::reset(){
     current_t=0;
     onsTime.clear();
+    onsStrength.clear();
+    
 }
 
 } // namespace streaming
