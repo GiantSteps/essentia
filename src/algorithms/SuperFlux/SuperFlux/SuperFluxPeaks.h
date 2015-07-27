@@ -41,6 +41,10 @@ private:
     Real _ratioThreshold;
     
     Real peakTime;
+    Real lastVal;
+    bool wasMax;
+    bool activation_slope;
+    bool wasActivated;
     
     int hopSize;
     Real frameRate;
@@ -53,7 +57,7 @@ public:
         declareOutput(_strengths, "strengths", "the output instants [s]");
         _movAvg = AlgorithmFactory::create("MovingAverage");
         _maxf = AlgorithmFactory::create("MaxFilter");
-        peakTime = 0;
+
         
     }
     
@@ -71,10 +75,13 @@ public:
         declareParameter("combine", "ms for onset combination", "(0,inf)", 30.);
         declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100.);
         declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30.);
+        declareParameter("activation_slope", "add the time where thresholds have been activated (different than actual maximum),corresponding strengths values will be set to zero", "{false,true}", false);
         
     }
     
-    void reset() {Algorithm::reset();_maxf->reset();_movAvg->reset();peakTime=0;};
+    void reset() {
+        Algorithm::reset();_maxf->reset();_movAvg->reset();peakTime=0;lastVal=0;wasMax = false;
+    };
     void configure();
     void compute();
     
@@ -130,6 +137,7 @@ public:
         declareParameter("combine", "ms for onset combination", "(0,inf)", 30.0);
         declareParameter("pre_avg", "use N miliseconds past information for moving average", "(0,inf)", 100.);
         declareParameter("pre_max", "use N miliseconds past information for moving maximum", "(0,inf)", 30.);
+        declareParameter("activation_slope", "add the time where thresholds have been activated (different than actual maximum),corresponding strengths values will be set to zero", "{false,true}", false);
     };
     
     
