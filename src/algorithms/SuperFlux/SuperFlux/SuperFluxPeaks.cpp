@@ -106,7 +106,6 @@ namespace essentia {
                 {
                     
                     //               cout << "found : lin" << isOverLinearThreshold << "ratio: " << isOverratioThreshold << endl;
-                    cout << lastVal << " : " <<signal[i] << " : " << maxs[i] << " : " <<  avg[i] << endl;
                     peakTime = i*1.0/frameRate;
                     if((nDetec>0 && peakTime-peaks[nDetec-1]>_combine)  ||  nDetec ==0) {
                         peaks[nDetec] = peakTime;
@@ -138,9 +137,6 @@ namespace essentia {
                     wasMax |= isMax;
                     
                     
-                }
-                if(wasMax){
-                    cout << "w" << endl;
                 }
                 
                 lastVal = signal[i];
