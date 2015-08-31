@@ -121,7 +121,7 @@ namespace essentia {
                 
                 // we want to avoid ratioThreshold noisy activation in really low flux parts so we set noise floor
                 // set by default to 10-7 (REALLY LOW for a flux)
-                else if(signal[i]==maxs[i]){//&& signal[i]>1e-8){
+                else if(signal[i]==maxs[i]&& signal[i]>1e-8){
                     
                     bool isOverLinearThreshold = _threshold>0 &&  signal[i]>avg[i]+_threshold ;
                     bool isOverratioThreshold = _ratioThreshold>0 &&avg[i]>0 && signal[i]*1.0/avg[i]>_ratioThreshold;
@@ -147,10 +147,7 @@ namespace essentia {
             
         }
         
-        
-        
-        
-        
+      
         
     } // namespace standard
 } // namespace essentia
