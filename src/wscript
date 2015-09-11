@@ -34,6 +34,10 @@ def options(ctx):
     ctx.add_option('--fft', action='store',
                    dest='FFT', default='FFTW',
                    help='FFT to use - options are \'FFTW\'(default), \'KISS\', and \'ACCELERATE\' framework (Mac Only)')
+    ctx.add_option('--no_build', action='store_true',
+        			dest='NO_BUILD', default=False,
+        			help='dont build')
+
 
 def debian_version():
     try:
@@ -337,38 +341,39 @@ def build(ctx):
         ctx.env.INCLUDES += ['3rdparty/kiss_fft130' ] 
         sources += [ ctx.path.find_resource('3rdparty/kiss_fft130/kiss_fft.c') ] 
         sources += [ ctx.path.find_resource('3rdparty/kiss_fft130/tools/kiss_fftr.c') ]        
-
-    ctx.stlib(
-        source   = sources,
-        target   = 'essentia',
-        use      = ctx.env.USES,
-        install_path = '${PREFIX}/lib',
-        #includes = ctx.env.includes
-    )
     
-    def write_pcfile(task):
-        open('build/essentia.pc', 'w').write(ctx.env.pcfile)
+    if ctx.env.NO_BUILD==False:
+	    ctx.stlib(
+	        source   = sources,
+	        target   = 'essentia',
+	        use      = ctx.env.USES,
+	        install_path = '${PREFIX}/lib',
+	        #includes = ctx.env.includes
+	    )
+	    
+        def write_pcfile(task):
+            open('build/essentia.pc', 'w').write(ctx.env.pcfile)
 
-    ctx(rule=write_pcfile,  name='write_pcfile', target='../essentia.pc')
-    ctx.add_group()
-
-
-    # install headers if asked to
-    headers = ctx.path.ant_glob('essentia/**/*.h')
-    for h in headers:
-        install_dir = os.path.split(h.srcpath())[0][4:]
-        ctx.install_files('${PREFIX}/include/' + install_dir, h)
-    # version.h
-    ctx.install_files('${PREFIX}/include/essentia', 'version.h')
-
-    # install pkgconfig file
-    #pc = ctx.path.ant_glob('essentia/build/essentia.pc') #TODO remove
-    #ctx.install_files('${PREFIX}/lib/pkgconfig', pc)     #TODO remove
-    ctx.install_files('${PREFIX}/lib/pkgconfig', '../build/essentia.pc')
+        ctx(rule=write_pcfile,  name='write_pcfile', target='../essentia.pc')
+        ctx.add_group()
 
 
-    if ctx.env.EXAMPLE_LIST or ctx.env.WITH_VAMP:
-        ctx.recurse('examples')
+        # install headers if asked to
+        headers = ctx.path.ant_glob('essentia/**/*.h')
+        for h in headers:
+            install_dir = os.path.split(h.srcpath())[0][4:]
+            ctx.install_files('${PREFIX}/include/' + install_dir, h)
+        # version.h
+        ctx.install_files('${PREFIX}/include/essentia', 'version.h')
 
-    if ctx.env.WITH_PYTHON:
-        ctx.recurse('python')
+        # install pkgconfig file
+        #pc = ctx.path.ant_glob('essentia/build/essentia.pc') #TODO remove
+        #ctx.install_files('${PREFIX}/lib/pkgconfig', pc)     #TODO remove
+        ctx.install_files('${PREFIX}/lib/pkgconfig', '../build/essentia.pc')
+
+
+        if ctx.env.EXAMPLE_LIST or ctx.env.WITH_VAMP:
+            ctx.recurse('examples')
+
+        if ctx.env.WITH_PYTHON:
+            ctx.recurse('python')
