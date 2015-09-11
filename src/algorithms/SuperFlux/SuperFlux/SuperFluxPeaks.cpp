@@ -90,11 +90,11 @@ void SuperFluxPeaks::compute() {
         // we want to avoid ratioThreshold noisy activation in really low flux parts so we set noise floor
         // set by default to 10-7 (REALLY LOW for a flux)
         if(signal[i]==maxs[i]&& signal[i]>1e-8){
-            bool isOverLinearThreshold = _threshold>0 &&  signal[i]>avg[i]+_threshold ;
-            bool isOverratioThreshold = _ratioThreshold>0 &&avg[i]>0 && signal[i]*1.0/avg[i]>_ratioThreshold;
+            bool isOverLinearThreshold = _threshold==0 ||  signal[i]>avg[i]+_threshold ;
+            bool isOverratioThreshold = _ratioThreshold==0 || (avg[i]>0 && signal[i]*1.0/avg[i]>_ratioThreshold);
             
-            
-        if( isOverLinearThreshold||isOverratioThreshold)
+
+        if( isOverLinearThreshold && isOverratioThreshold)
            {
             
             peakTime = i*1.0/frameRate;
@@ -153,8 +153,12 @@ void SuperFluxPeaks::consume() {
         }
         
         // copy if there is something to copy
-        if(!trimBeg || onsTime.size()>1){
-            onsTime.insert(onsTime.end(), out.begin(),out.end() - (trimBeg?1:0));
+//        if(!trimBeg || onsTime.size()>1){
+            for(int i = trimBeg && onsTime.size()>1?1:0 ; i < out.size() ; i++){
+                onsTime.push_back(out[i]+current_t);
+
+//            }
+//            onsTime.insert(onsTime.end(), out.begin(),out.end() - (trimBeg?1:0));
         }
         
     }
