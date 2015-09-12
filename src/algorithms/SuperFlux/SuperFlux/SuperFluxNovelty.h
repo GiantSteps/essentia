@@ -117,8 +117,7 @@ void configure() {
   }
 
   AlgorithmStatus process();
-  void reset(){
-  };
+
 
   static const char* name;
   static const char* description;
