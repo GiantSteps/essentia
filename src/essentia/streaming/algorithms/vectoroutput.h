@@ -80,9 +80,6 @@ class VectorOutput : public Algorithm {
     return OK;
   }
 
-  void reset() {
-    //_acquireSize = acquireSize;
-  }
 };
 
 template <typename TokenType, typename StorageType>

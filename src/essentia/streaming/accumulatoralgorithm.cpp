@@ -13,6 +13,7 @@ namespace streaming {
 AccumulatorAlgorithm::AccumulatorAlgorithm() : _preferredSize(0), _inputStream(0) {}
 
 void AccumulatorAlgorithm::reset() {
+    Algorithm::reset();
   _inputStream->setAcquireSize(_preferredSize);
   _inputStream->setReleaseSize(_preferredSize);
 }
