@@ -131,6 +131,15 @@ class Network {
    */
   bool runStep();
 
+    /**
+     * run stack after generator has been consumed
+     *
+     *
+     *
+     */
+  void runStack(bool endOfStream);
+    
+    
   /**
    * Rebuilds the visible and execution network.
    */
@@ -161,9 +170,6 @@ class Network {
    */
   void deleteAlgorithms();
 
-
-    void initStack();
-    void runStack(bool endOfStream);
   /**
    * Find and return an algorithm by its name.
    * Throw an exception if no algorithm was found with the given name.
