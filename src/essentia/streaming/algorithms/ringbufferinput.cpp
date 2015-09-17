@@ -48,7 +48,7 @@ void RingBufferInput::configure()
 	delete _impl;
 	_impl = new RingBufferImpl(RingBufferImpl::kAvailable,_bufferSize);
 }
-
+bool RingBufferInput::isEmpty(){return _impl->_available == 0;}
 void RingBufferInput::add(Real* inputData, int size)
 {
 	//std::cerr << "adding " << size << " to ringbuffer with space " << _impl->_space << std::endl;

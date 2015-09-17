@@ -43,6 +43,7 @@ class RingBufferInput : public Algorithm {
   void shouldStop(bool stop) {
     E_DEBUG(EExecution, "RBI should stop...");
   }
+    bool isEmpty();
 
   void declareParameters() {
 // not called as its not registered
