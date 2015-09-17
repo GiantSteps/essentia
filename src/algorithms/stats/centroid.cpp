@@ -26,12 +26,14 @@ const char* Centroid::name = "Centroid";
 const char* Centroid::description = DOC("This algorithm extracts the centroid (first order central moment), normalized to a specified range, of the input array.\n"
 "Note:\n"
 " - For a spectral centroid [hz], frequency range should be equal to samplerate/2\n"
-" - For an audio centroid [s], frequency range should be equal to (audio_size-1) / samplerate\n"
+" - For an audio centroid [s], range should be equal to (audio_size_in_samples-1) / samplerate\n"
 "Exceptions are thrown when input array contains less than 2 elements.\n"
 "\n"
 "References:\n"
 "  [1] Function Centroid -- from Wolfram MathWorld,\n"
-"  http://mathworld.wolfram.com/FunctionCentroid.html");
+"  http://mathworld.wolfram.com/FunctionCentroid.html\n"
+"  [2] Spectral centroid - Wikipedia, the free encyclopedia,\n"
+"  https://en.wikipedia.org/wiki/Spectral_centroid");
 
 
 void Centroid::configure() {

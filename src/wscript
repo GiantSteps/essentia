@@ -34,7 +34,6 @@ def options(ctx):
     ctx.add_option('--fft', action='store',
                    dest='FFT', default='FFTW',
                    help='FFT to use - options are \'FFTW\'(default), \'KISS\', and \'ACCELERATE\' framework (Mac Only)')
-    ctx.add_option('--no_build', action = 'store_true',dest='NOBUILD',default=False,help='generate headers but no build')
 
 def debian_version():
     try:
@@ -62,7 +61,6 @@ def configure(ctx):
     ctx.env.ALGOIGNORE = []
     ctx.env.IGNORE_ALGOS  = ctx.options.IGNORE_ALGOS
     ctx.env.FFT  = ctx.options.FFT
-    ctx.env.NOBUILD = ctx.options.NOBUILD
 
     if ctx.env.WITH_STATIC_EXAMPLES and not ctx.env.EXAMPLES:
         ctx.env.WITH_EXAMPLES = True
@@ -291,10 +289,6 @@ def build(ctx):
     # Here we remove the FFTs we don't want from algos 
     # before creating the algoreg cpp file
 
-    import json
-    with open('algos_start.txt', 'w') as outfile:
-        json.dump(algos, outfile, indent=4)
-
     #Remove the unnecessary FFT algorithms 
     fftsToRemove = []
     if 'ACCELERATE' in ctx.env.FFT:
@@ -308,9 +302,6 @@ def build(ctx):
         if key in algos:            
             del algos[key]
 
-    with open('algos_end.txt', 'w') as outfile:
-        json.dump(algos, outfile, indent=4)            
-    
     create_registration_cpp(algos, algoreg_path, use_streaming=True)
 
     sources = ctx.path.ant_glob('essentia/**/*.cpp')
@@ -347,38 +338,37 @@ def build(ctx):
         sources += [ ctx.path.find_resource('3rdparty/kiss_fft130/kiss_fft.c') ] 
         sources += [ ctx.path.find_resource('3rdparty/kiss_fft130/tools/kiss_fftr.c') ]        
 
-    if not ctx.env.NOBUILD :
-        ctx.stlib(
-            source   = sources,
-            target   = 'essentia',
-            use      = ctx.env.USES,
-            install_path = '${PREFIX}/lib',
-            #includes = ctx.env.includes
-        )
+    ctx.stlib(
+        source   = sources,
+        target   = 'essentia',
+        use      = ctx.env.USES,
+        install_path = '${PREFIX}/lib',
+        #includes = ctx.env.includes
+    )
     
-        def write_pcfile(task):
-            open('build/essentia.pc', 'w').write(ctx.env.pcfile)
+    def write_pcfile(task):
+        open('build/essentia.pc', 'w').write(ctx.env.pcfile)
 
-        ctx(rule=write_pcfile,  name='write_pcfile', target='../essentia.pc')
-        ctx.add_group()
-
-
-        # install headers if asked to
-        headers = ctx.path.ant_glob('essentia/**/*.h')
-        for h in headers:
-            install_dir = os.path.split(h.srcpath())[0][4:]
-            ctx.install_files('${PREFIX}/include/' + install_dir, h)
-        # version.h
-        ctx.install_files('${PREFIX}/include/essentia', 'version.h')
-
-        # install pkgconfig file
-        #pc = ctx.path.ant_glob('essentia/build/essentia.pc') #TODO remove
-        #ctx.install_files('${PREFIX}/lib/pkgconfig', pc)     #TODO remove
-        ctx.install_files('${PREFIX}/lib/pkgconfig', '../essentia.pc')
+    ctx(rule=write_pcfile,  name='write_pcfile', target='../essentia.pc')
+    ctx.add_group()
 
 
-        if ctx.env.EXAMPLE_LIST or ctx.env.WITH_VAMP:
-            ctx.recurse('examples')
+    # install headers if asked to
+    headers = ctx.path.ant_glob('essentia/**/*.h')
+    for h in headers:
+        install_dir = os.path.split(h.srcpath())[0][4:]
+        ctx.install_files('${PREFIX}/include/' + install_dir, h)
+    # version.h
+    ctx.install_files('${PREFIX}/include/essentia', 'version.h')
 
-        if ctx.env.WITH_PYTHON:
-            ctx.recurse('python')
+    # install pkgconfig file
+    #pc = ctx.path.ant_glob('essentia/build/essentia.pc') #TODO remove
+    #ctx.install_files('${PREFIX}/lib/pkgconfig', pc)     #TODO remove
+    ctx.install_files('${PREFIX}/lib/pkgconfig', '../build/essentia.pc')
+
+
+    if ctx.env.EXAMPLE_LIST or ctx.env.WITH_VAMP:
+        ctx.recurse('examples')
+
+    if ctx.env.WITH_PYTHON:
+        ctx.recurse('python')
