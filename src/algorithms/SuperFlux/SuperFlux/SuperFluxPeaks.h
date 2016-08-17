@@ -45,7 +45,7 @@ private:
     bool wasMax;
     bool activation_slope;
     bool wasActivated;
-    
+    Real curStrength = 0;
     int hopSize;
     Real frameRate;
 
@@ -111,7 +111,8 @@ protected:
     
 
     float current_t;
-    
+
+
     float framerate,_combine;
     std::vector<Real> onsTime,onsStrength;
 

@@ -333,7 +333,7 @@ void Network::runStack(bool endOfStream){
             
         }
     }
-    E_DEBUG(EScheduler, dash << " Buffer states after running the generator and all the nodes " << dash);
+//    E_DEBUG(EScheduler, dash << " Buffer states after running the generator and all the nodes " << dash);
     printBufferFillState();
         
 }
