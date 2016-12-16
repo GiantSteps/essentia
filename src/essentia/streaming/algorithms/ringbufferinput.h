@@ -48,6 +48,7 @@ class RingBufferInput : public Algorithm {
 
   void configure();
   void reset();
+  bool isEmpty();
 
   static const char* name;
   static const char* description;

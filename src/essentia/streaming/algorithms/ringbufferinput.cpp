@@ -56,6 +56,9 @@ void RingBufferInput::add(Real* inputData, int size)
 	if (added < size) throw EssentiaException("Not enough space in ringbuffer at input");
 }
 
+  bool RingBufferInput::isEmpty(){
+    return _impl!=nullptr && _impl->_available ==0;
+  }
 AlgorithmStatus RingBufferInput::process() {
   //std::cerr << "ringbufferinput waiting" << std::endl;
   _impl->waitAvailable();
